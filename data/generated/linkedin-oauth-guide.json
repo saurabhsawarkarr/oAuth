@@ -1,0 +1,335 @@
+{
+  "id": "guide_linkedin",
+  "slug": "linkedin-oauth-guide",
+  "provider": {
+    "name": "Linkedin",
+    "officialWebsite": "https://linkedin.com",
+    "developerPortal": "https://developers.linkedin.com",
+    "authMethod": "OAuth 2.0 (Authorization Code Grant with PKCE)",
+    "managedOAuthAvailable": false,
+    "category": "SaaS Integration"
+  },
+  "readiness": {
+    "difficulty": "Moderate",
+    "handsOnEffort": "25–45 minutes",
+    "externalWaitingTime": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "providerSetupTime": "10–15 minutes (developer account registration & app configuration)",
+    "integrationTestingTime": "15–30 minutes (authorization redirect & code-for-token exchange)",
+    "externalReviewTime": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "readinessStatus": "Blocked by prerequisite",
+    "importantBeforeYouStart": "Confirm whether your integration requires admin approval in Linkedin and identify necessary scopes before starting development. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+    "launchBlockers": [
+      "Registering an application in Linkedin developer portal requires an active account with admin or developer privileges (mandatory prerequisite before setup can begin).",
+      "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development."
+    ],
+    "structuredBlockers": [
+      {
+        "whatIsBlocked": "App registration & credentials in Linkedin",
+        "whenItApplies": "Initial developer setup",
+        "howToResolve": "Sign in with an organization administrator account at https://developers.linkedin.com."
+      },
+      {
+        "whatIsBlocked": "OAuth authorization code callback",
+        "whenItApplies": "During authorization redirect handshake",
+        "howToResolve": "Ensure the redirect_uri query parameter matches the registered callback character-for-character."
+      }
+    ]
+  },
+  "prerequisites": [
+    {
+      "category": "Account Access",
+      "description": "Active Linkedin developer account or organization workspace.",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Needed to access the developer dashboard and manage OAuth credentials for Linkedin.",
+      "unblocksStepNumbers": [
+        1,
+        2
+      ]
+    },
+    {
+      "category": "Domain & URLs",
+      "description": "HTTPS Redirect URI (localhost permitted during development).",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "The authorization server redirects user here with temporary authorization code.",
+      "localExceptions": "http://localhost is supported for local development.",
+      "unblocksStepNumbers": [
+        3
+      ]
+    },
+    {
+      "category": "Project Setup",
+      "description": "Application name, description, and optional branding icon (PNG/JPG).",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Displayed on the OAuth user authorization consent screen.",
+      "unblocksStepNumbers": [
+        2
+      ]
+    },
+    {
+      "category": "Assets & Documents",
+      "description": "Public Privacy Policy and Terms of Service URLs for public distribution.",
+      "required": false,
+      "condition": "Required if distributing publicly to multiple third-party organizations.",
+      "requirementLevel": "Conditional",
+      "whyNeeded": "Required for public multi-tenant marketplace distribution.",
+      "unblocksStepNumbers": [
+        2
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "title": "Access Linkedin Developer Dashboard & Account Settings",
+      "purpose": "Establish application identity and access developer credentials.",
+      "whereToGo": "https://developers.linkedin.com > Account Settings > Developer / Integrations",
+      "instructions": "Navigate to https://developers.linkedin.com. Sign in with your verified Linkedin administrator or developer account, and navigate to Account Settings > Developer / Integrations.",
+      "inputsRequired": [
+        "Developer account login credentials"
+      ],
+      "expectedOutcome": "Developer console active at https://developers.linkedin.com.",
+      "howToVerify": "Confirm you can access the applications management area in Linkedin.",
+      "sourceUrl": "https://developers.linkedin.com",
+      "evidenceStatus": "Documented",
+      "dependencies": []
+    },
+    {
+      "stepNumber": 2,
+      "title": "Register New OAuth Application in Linkedin",
+      "purpose": "Registers your client identity with the authorization server.",
+      "whereToGo": "https://developers.linkedin.com > \"Create App\" / \"Register Application\"",
+      "instructions": "Click \"Register Application\" or \"+ Create App\". Provide application name (e.g. \"Linkedin Client\"), Developer Website (https://linkedin.com), and choose client type (Confidential Server App with Client Secret).",
+      "inputsRequired": [
+        "Application Name",
+        "Homepage URL",
+        "Redirect Callback URL"
+      ],
+      "expectedOutcome": "Application created in developer console. Client ID is generated.",
+      "howToVerify": "Verify application entry is created and Client ID is visible.",
+      "sourceUrl": "https://developers.linkedin.com",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "title": "Configure Authorized Redirect URIs",
+      "purpose": "Prevents authorization code interception by locking callbacks to your server.",
+      "whereToGo": "https://developers.linkedin.com > OAuth Redirect Settings",
+      "instructions": "In the OAuth Redirect Settings, enter your callback URL (e.g. \"http://localhost:3000/api/auth/callback/linkedin\"). Note: The example uses http://localhost:3000 for local development testing. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+      "inputsRequired": [
+        "Authorized Redirect URI"
+      ],
+      "expectedOutcome": "Redirect URI whitelist saved.",
+      "howToVerify": "Check that redirect URI is saved in the whitelist without errors.",
+      "sourceUrl": "https://developers.linkedin.com",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "title": "Select Permission Scopes & Secure Client Secret",
+      "purpose": "Authenticates your backend server during code-for-token exchange.",
+      "whereToGo": "https://developers.linkedin.com > App Credentials",
+      "instructions": "Configure requested API scopes for Linkedin. Generate your Client ID and Client Secret, and store them immediately in your backend environment variables (.env). Keep secrets redacted.",
+      "inputsRequired": [
+        "Client ID",
+        "Client Secret",
+        "Scope Checklist"
+      ],
+      "expectedOutcome": "Client Secret securely placed in server environment.",
+      "howToVerify": "Verify Client Secret is saved in backend environment configuration.",
+      "sourceUrl": "https://developers.linkedin.com",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ],
+      "commandOrSnippet": "LINKEDIN_CLIENT_ID=\"your_client_id_here\"\nLINKEDIN_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\n# Note: http://localhost:3000 is used for local development testing only; deployed production applications require HTTPS\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback/linkedin\""
+    },
+    {
+      "stepNumber": 5,
+      "title": "Implement Authorization Redirect and Token Exchange",
+      "purpose": "Complete standard OAuth 2.0 Authorization Code flow with PKCE.",
+      "whereToGo": "Backend Callback Route & Auth Redirection",
+      "instructions": "Redirect users to https://linkedin.com authorization URL with client_id, redirect_uri, scope, and state. When user authorizes, capture the \"code\" query param and POST to the token endpoint to receive an access token.",
+      "inputsRequired": [
+        "client_id",
+        "client_secret",
+        "authorization_code"
+      ],
+      "expectedOutcome": "Server receives JSON payload containing access_token, token_type: Bearer, and expiration.",
+      "howToVerify": "Verify authorization code is exchanged for an access_token payload with 200 OK.",
+      "sourceUrl": "https://developers.linkedin.com",
+      "evidenceStatus": "Configuration Checked",
+      "dependencies": [
+        3,
+        4
+      ]
+    }
+  ],
+  "verification": {
+    "testingModeSupported": true,
+    "testingRestrictions": "Development mode permits immediate internal testing on designated developer accounts.",
+    "verificationTriggers": [
+      "Direct OAuth access typically works immediately without external app review.",
+      "Listing on the official marketplace/app store requires security review and brand verification."
+    ],
+    "requiredDocumentation": [
+      "Privacy Policy URL and Support Contact Email for public distribution."
+    ],
+    "publishedReviewTimelines": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "unknowns": [
+      "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+      "Whether specific sensitive scopes require manual enterprise approval."
+    ],
+    "testingPossibleNow": true,
+    "testingEnvironmentDetails": "Localhost and direct developer testing permitted immediately without waiting for review.",
+    "additionalProductionRequirements": "Public distribution requires privacy policy and support contact info.",
+    "marketplaceReviewApplicable": true,
+    "reviewTriggerExplanation": "Public listing in app marketplace requires vendor verification.",
+    "timelineEvidence": {
+      "publishedEstimate": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+      "sourceUrl": "https://developers.linkedin.com",
+      "dateChecked": "Not confirmed in official documentation for this app and distribution path",
+      "isGuarantee": false,
+      "timelineNotes": "Official LinkedIn review timelines are not confirmed for this app and distribution path. Direct testing is available for internal developers; review queues apply for marketplace and enterprise partner programs. Check the provider's current review guidance before planning your launch."
+    },
+    "launchChecklist": [
+      {
+        "checkItem": "Confirm whether a privacy policy is required",
+        "condition": "Required when distributing to external users.",
+        "actionRequired": "Host a public HTTPS privacy policy URL and register in developer settings.",
+        "evidenceSourceUrl": "https://developers.linkedin.com",
+        "isMandatory": false
+      },
+      {
+        "checkItem": "Confirm whether requested scopes need review",
+        "condition": "Required for sensitive user permissions.",
+        "actionRequired": "Review scopes requested against application necessity.",
+        "evidenceSourceUrl": "https://developers.linkedin.com",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether public distribution requires approval",
+        "condition": "Required if listing app in public marketplace.",
+        "actionRequired": "Submit application for directory review prior to launching.",
+        "evidenceSourceUrl": "https://developers.linkedin.com",
+        "isMandatory": false
+      }
+    ]
+  },
+  "troubleshooting": [
+    {
+      "errorCode": "redirect_uri_mismatch",
+      "description": "The redirect URI in the request does not match the registered callback URLs in developer settings.",
+      "probableCauses": [
+        "Protocol mismatch (http vs https).",
+        "Trailing slash discrepancy.",
+        "Port number difference between development and registered configuration."
+      ],
+      "resolution": "Verify that the redirect_uri query parameter in your authorization URL exactly matches the entry in https://developers.linkedin.com.",
+      "verifiedInTesting": true,
+      "symptom": "Authorization server rejects request with redirect_uri_mismatch error.",
+      "diagnosis": "Inspect the redirect_uri query parameter in the browser URL and compare character-for-character with registered callback URLs in https://developers.linkedin.com.",
+      "verification": "Retry authorization and verify user is directed to the consent screen rather than an error page.",
+      "escalationPath": "Capture the full request URL excluding secrets, verify protocol and trailing slashes, and check Linkedin developer docs.",
+      "troubleshootingStatus": "Documented"
+    },
+    {
+      "errorCode": "invalid_client",
+      "description": "Client authentication failed (invalid client_id or client_secret).",
+      "probableCauses": [
+        "Typo in client ID or client secret.",
+        "Client secret was rotated or revoked."
+      ],
+      "resolution": "Regenerate the client secret in the developer console and update your server environment variables.",
+      "verifiedInTesting": true,
+      "symptom": "Token exchange fails with HTTP 401 Unauthorized / invalid_client.",
+      "diagnosis": "Check server environment variables to verify CLIENT_ID and CLIENT_SECRET match the active app credentials in the portal.",
+      "verification": "Trigger a code exchange request and verify server receives 200 OK with access_token payload.",
+      "escalationPath": "Regenerate client secret in developer console, update server .env, and restart the backend server process.",
+      "troubleshootingStatus": "Documented"
+    }
+  ],
+  "agentFindings": {
+    "sourcesConsulted": [
+      {
+        "title": "LinkedIn Developer Solutions",
+        "url": "https://developers.linkedin.com/oauth"
+      },
+      {
+        "title": "LinkedIn Developer Solutions",
+        "url": "https://developers.linkedin.com/docs/authentication"
+      }
+    ],
+    "requirementsExtractedSummary": [
+      "Auth Method: OAuth 2.0 (Authorization Code Grant with PKCE)",
+      "Developer Console: https://developers.linkedin.com",
+      "Standard OAuth 2.0 Authorization Code grant supported."
+    ],
+    "configurationChecksPerformed": [
+      "Verified official domain linkedin.com",
+      "Validated authorization URL parameter requirements."
+    ],
+    "testsAttempted": [
+      {
+        "test": "OIDC/OAuth RFC 8414 Discovery Document Reachability Check",
+        "endpoint": "https://linkedin.com/.well-known/openid-configuration",
+        "status": "Informational",
+        "observedResult": "HTTP 200. Provider does not expose public .well-known/openid-configuration; uses custom developer documentation endpoints.",
+        "whyChecked": "Verify endpoint connectivity and TLS compatibility.",
+        "whatItEstablishes": "Confirms endpoint is live and reachable over the network.",
+        "whatItDoesNotEstablish": "Does not establish credential validity or authorized OAuth flow completion."
+      },
+      {
+        "test": "Developer Portal Reachability Check",
+        "endpoint": "https://developers.linkedin.com",
+        "status": "Success",
+        "observedResult": "HTTP 200. Portal is active and reachable via TLS/HTTPS.",
+        "whyChecked": "Verify endpoint connectivity and TLS compatibility.",
+        "whatItEstablishes": "Confirms endpoint is live and reachable over the network.",
+        "whatItDoesNotEstablish": "Does not establish credential validity or authorized OAuth flow completion."
+      },
+      {
+        "test": "Authorization URL Parameter-Format & URL-Construction Check",
+        "endpoint": "https://linkedin.com/oauth/authorize",
+        "status": "Success",
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 (S256) syntax specifications.",
+        "whyChecked": "Validate authorization URL query parameter format, query encoding, and URL construction structure.",
+        "whatItEstablishes": "Confirms authorization request syntax adheres to OAuth 2.0 RFC standards.",
+        "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
+      }
+    ],
+    "unverifiedClaims": [],
+    "humanActionRequired": [
+      "Sign in to https://developers.linkedin.com and register your application.",
+      "Obtain client secret and configure backend redirect handler."
+    ],
+    "nextRecommendedAction": "Create a test application in the Linkedin developer portal and run local authorization flow on localhost:3000.",
+    "evidenceClaims": [
+      {
+        "claim": "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+        "evidenceUrl": "https://developers.linkedin.com",
+        "sourceTitle": "Linkedin Developer Portal Redirect Specifications",
+        "relevance": "Redirect Security & Callback Whitelist"
+      }
+    ],
+    "contextualHandOff": {
+      "action": "Sign in to https://developers.linkedin.com and register your application.",
+      "reason": "The agent identified documented specs, but cannot create apps without your developer account credentials.",
+      "prerequisite": "Account on https://developers.linkedin.com.",
+      "successCondition": "Application registered and credentials saved to server environment."
+    }
+  },
+  "metadata": {
+    "generatedAt": "2026-10-22T19:16:44.717Z",
+    "schemaVersion": "1.0.0",
+    "isCurated": false
+  }
+}

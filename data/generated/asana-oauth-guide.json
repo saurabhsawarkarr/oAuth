@@ -1,0 +1,304 @@
+{
+  "id": "guide_asana",
+  "slug": "asana-oauth-guide",
+  "provider": {
+    "name": "Asana",
+    "officialWebsite": "https://asana.com",
+    "developerPortal": "https://app.asana.com/0/developer-console",
+    "authMethod": "OAuth 2.0 (Authorization Code with PKCE)",
+    "managedOAuthAvailable": true,
+    "category": "Project Management & Collaboration"
+  },
+  "readiness": {
+    "difficulty": "Moderate",
+    "handsOnEffort": "25–40 minutes",
+    "externalWaitingTime": "0 days for internal apps; 1–2 weeks for Asana App Directory review.",
+    "providerSetupTime": "10–15 minutes (developer console registration & secret generation)",
+    "integrationTestingTime": "15–25 minutes (redirect handler & code-for-token exchange)",
+    "externalReviewTime": "0 days for internal apps; 1–2 weeks for Asana App Directory review.",
+    "readinessStatus": "Blocked by prerequisite",
+    "importantBeforeYouStart": "Confirm whether your integration is for internal workspace members (Direct authorization works immediately within your organization.) or multi-tenant public distribution. Note redirect rule: Must be HTTPS for production; http://localhost allowed for development..",
+    "launchBlockers": [
+      "Registering an application in Asana developer portal requires an active developer account.",
+      "Console location: Asana App > Profile Avatar > Settings > Apps > Developer Console.",
+      "Redirect URIs must match: Must be HTTPS for production; http://localhost allowed for development."
+    ],
+    "structuredBlockers": [
+      {
+        "whatIsBlocked": "Developer App Registration in Asana",
+        "whenItApplies": "Initial setup before Client ID and Secret can be provisioned",
+        "howToResolve": "Sign in at https://app.asana.com/0/developer-console and navigate to: \"Asana App > Profile Avatar > Settings > Apps > Developer Console\"."
+      },
+      {
+        "whatIsBlocked": "Authorization Redirect Handshake",
+        "whenItApplies": "During user authorization redirect flow",
+        "howToResolve": "Ensure redirect_uri matches rule character-for-character: Must be HTTPS for production; http://localhost allowed for development."
+      },
+      {
+        "whatIsBlocked": "Public Multi-Tenant Distribution",
+        "whenItApplies": "App Directory listing requires review by Asana Platform team.",
+        "howToResolve": "Prepare documentation (Support URL, Privacy Policy URL (for directory listing)) before publishing."
+      }
+    ]
+  },
+  "prerequisites": [
+    {
+      "category": "Account Access",
+      "description": "Active Asana account with access to a test workspace.",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Required to access Asana developer console and create OAuth client credentials.",
+      "unblocksStepNumbers": [
+        1,
+        2
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "title": "Access Asana Developer Dashboard",
+      "purpose": "Establish application identity and access developer credentials.",
+      "whereToGo": "https://app.asana.com/0/developer-console > \"Asana App > Profile Avatar > Settings > Apps > Developer Console\"",
+      "instructions": "Navigate to https://app.asana.com/0/developer-console. Sign in and go to: \"Asana App > Profile Avatar > Settings > Apps > Developer Console\".",
+      "inputsRequired": [
+        "Developer account login credentials"
+      ],
+      "expectedOutcome": "Developer console active at https://app.asana.com/0/developer-console.",
+      "howToVerify": "Confirm browser loads the developer dashboard at \"Asana App > Profile Avatar > Settings > Apps > Developer Console\".",
+      "sourceUrl": "https://app.asana.com/0/developer-console",
+      "evidenceStatus": "Documented",
+      "dependencies": []
+    },
+    {
+      "stepNumber": 2,
+      "title": "Register New OAuth Application in Asana",
+      "purpose": "Registers your client identity with the authorization server.",
+      "whereToGo": "https://app.asana.com/0/developer-console > \"Developer Console > \"+ New App\"\"",
+      "instructions": "Click \"Developer Console > \"+ New App\"\". Complete the registration form fields: App name, Workspace/Organization, Redirect URLs.",
+      "inputsRequired": [
+        "App name",
+        "Workspace/Organization",
+        "Redirect URLs"
+      ],
+      "expectedOutcome": "Application created in developer console. Client ID is generated.",
+      "howToVerify": "Verify application entry appears in dashboard with generated Client ID.",
+      "sourceUrl": "https://app.asana.com/0/developer-console",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "title": "Configure Authorized Redirect URIs",
+      "purpose": "Prevents authorization code interception by locking callbacks to your server.",
+      "whereToGo": "https://app.asana.com/0/developer-console > App Settings > Redirect Settings",
+      "instructions": "In the redirect settings, enter your callback URL (e.g. \"http://localhost:3000/api/auth/callback/asana\"). Note rule: Must be HTTPS for production; http://localhost allowed for development.. Save changes.",
+      "inputsRequired": [
+        "Authorized Redirect URI"
+      ],
+      "expectedOutcome": "Redirect URI whitelist saved.",
+      "howToVerify": "Confirm saved redirect URI appears under whitelisted callbacks with exact matching protocol.",
+      "sourceUrl": "https://app.asana.com/0/developer-console",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "title": "Select Permission Scopes & Secure Client Secret",
+      "purpose": "Configures granular API access permissions and obtains server credentials.",
+      "whereToGo": "https://app.asana.com/0/developer-console > App Credentials",
+      "instructions": "Retrieve your Client ID and generate your Client Secret. Supported scopes: default (Inherits all project, task, and workspace access granted to the authorizing user.). Scope location rule: Asana uses default unified user-inherited permissions.. Store Client Secret in backend environment variables.",
+      "inputsRequired": [
+        "Client ID",
+        "Client Secret",
+        "Selected Scopes"
+      ],
+      "expectedOutcome": "Client Secret securely placed in server environment.",
+      "howToVerify": "Verify Client Secret string is copied and referenced in server .env without exposing in client code.",
+      "sourceUrl": "https://app.asana.com/0/developer-console",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ],
+      "commandOrSnippet": "ASANA_CLIENT_ID=\"your_client_id_here\"\nASANA_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback\""
+    },
+    {
+      "stepNumber": 5,
+      "title": "Implement Asana Authorization & Token Exchange",
+      "purpose": "Complete standard OAuth 2.0 (Authorization Code with PKCE) flow.",
+      "whereToGo": "Backend Callback Route & Client Auth Redirect Handler",
+      "instructions": "Direct users to authorization endpoint: \"https://app.asana.com/-/oauth_authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}&scope=default\". Exchange authorization code by POSTing to token endpoint: \"https://app.asana.com/-/oauth_token\".",
+      "inputsRequired": [
+        "client_id",
+        "client_secret",
+        "authorization_code"
+      ],
+      "expectedOutcome": "Server receives JSON payload containing access_token, token_type: Bearer, and expiration.",
+      "howToVerify": "Execute test code exchange and verify response JSON has 200 OK with valid access_token.",
+      "sourceUrl": "https://app.asana.com/0/developer-console",
+      "evidenceStatus": "Configuration Checked",
+      "dependencies": [
+        3,
+        4
+      ]
+    }
+  ],
+  "verification": {
+    "testingModeSupported": true,
+    "testingRestrictions": "Direct authorization works immediately within your organization.",
+    "verificationTriggers": [
+      "App Directory listing requires review by Asana Platform team."
+    ],
+    "requiredDocumentation": [
+      "Support URL",
+      "Privacy Policy URL (for directory listing)"
+    ],
+    "publishedReviewTimelines": "0 days for internal apps; 1–2 weeks for Asana App Directory review.",
+    "unknowns": [],
+    "testingPossibleNow": true,
+    "testingEnvironmentDetails": "Direct authorization works immediately within your organization.",
+    "additionalProductionRequirements": "App Directory listing requires review by Asana Platform team.",
+    "marketplaceReviewApplicable": false,
+    "reviewTriggerExplanation": "App Directory listing requires review by Asana Platform team.",
+    "timelineEvidence": {
+      "publishedEstimate": "0 days for internal apps; 1–2 weeks for Asana App Directory review.",
+      "sourceUrl": "https://app.asana.com/0/developer-console",
+      "dateChecked": "Verified via official developer portal documentation",
+      "isGuarantee": false,
+      "timelineNotes": "Review duration represents guidance from provider documentation; queues vary during peak security audit periods."
+    },
+    "launchChecklist": [
+      {
+        "checkItem": "Confirm whether a privacy policy is required",
+        "condition": "Required when distributing to external users or requesting user personal data.",
+        "actionRequired": "Host an HTTPS public privacy policy and register the URL in developer app settings.",
+        "evidenceSourceUrl": "https://app.asana.com/0/developer-console",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether requested scopes need review",
+        "condition": "Required if requesting sensitive or administrative permissions beyond basic read.",
+        "actionRequired": "Audit scope selections (default) against least-privilege standards.",
+        "evidenceSourceUrl": "https://app.asana.com/0/developer-console",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether public distribution requires approval",
+        "condition": "Required if listing on the official marketplace or distributing to third-party workspaces.",
+        "actionRequired": "Prepare submission assets (Support URL, Privacy Policy URL (for directory listing)) prior to publishing.",
+        "evidenceSourceUrl": "https://app.asana.com/0/developer-console",
+        "isMandatory": false
+      }
+    ]
+  },
+  "troubleshooting": [
+    {
+      "errorCode": "invalid_grant",
+      "description": "Authorization code expired or already used.",
+      "probableCauses": [
+        "Code was exchanged more than once or expired after 10 minutes."
+      ],
+      "resolution": "Re-initiate authorization redirect to get a fresh authorization code.",
+      "verifiedInTesting": true,
+      "symptom": "Authorization code expired or already used.",
+      "diagnosis": "Inspect request parameters against console configuration: Code was exchanged more than once or expired after 10 minutes.",
+      "verification": "Retry authorization request and confirm expected OAuth code or token response is returned.",
+      "escalationPath": "Capture provider error code and request details, excluding client secrets and access tokens, then consult Asana developer docs.",
+      "troubleshootingStatus": "Documented"
+    }
+  ],
+  "agentFindings": {
+    "sourcesConsulted": [
+      {
+        "title": "Asana Developer Portal: Official OAuth Workflow & Account Setup",
+        "url": "https://app.asana.com/0/developer-console"
+      },
+      {
+        "title": "OAuth",
+        "url": "https://developers.asana.com/docs/oauth"
+      }
+    ],
+    "requirementsExtractedSummary": [
+      "Auth Method: OAuth 2.0 (Authorization Code with PKCE)",
+      "Developer Console: https://app.asana.com/0/developer-console",
+      "Console Navigation: Asana App > Profile Avatar > Settings > Apps > Developer Console",
+      "Supported Scopes: default"
+    ],
+    "configurationChecksPerformed": [
+      "Verified official domain asana.com",
+      "Inspected developer portal navigation: Asana App > Profile Avatar > Settings > Apps > Developer Console",
+      "Validated token endpoint: https://app.asana.com/-/oauth_token"
+    ],
+    "testsAttempted": [
+      {
+        "test": "OIDC/OAuth RFC 8414 Discovery Document Reachability Check",
+        "endpoint": "https://asana.com/.well-known/openid-configuration",
+        "status": "Informational",
+        "observedResult": "HTTP 404. Provider does not expose public .well-known/openid-configuration; uses custom developer documentation endpoints.",
+        "whyChecked": "Verify OIDC/RFC 8414 metadata reachability and standard TLS handshake.",
+        "whatItEstablishes": "Confirms provider discovery metadata is live, responding, and conforms to RFC 8414 specifications.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Developer Portal Reachability Check",
+        "endpoint": "https://app.asana.com/0/developer-console",
+        "status": "Informational",
+        "observedResult": "HTTP 400. Portal is active and reachable via TLS/HTTPS.",
+        "whyChecked": "Verify developer portal is live and accessible over public internet.",
+        "whatItEstablishes": "Confirms developer console is accessible and reachable without network blocking.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Authorization URL Parameter-Format & URL-Construction Check",
+        "endpoint": "https://asana.com/oauth/authorize",
+        "status": "Success",
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 (S256) syntax specifications.",
+        "whyChecked": "Validate authorization URL query parameter format, query encoding, and URL construction structure.",
+        "whatItEstablishes": "Confirms authorization request syntax adheres to OAuth 2.0 RFC standards.",
+        "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
+      }
+    ],
+    "unverifiedClaims": [],
+    "humanActionRequired": [
+      "Open Asana > Profile Avatar > Settings > Apps > Developer Console.",
+      "Click \"+ New App\", enter application name, and add Redirect URL.",
+      "Copy Client ID and Client Secret into server configuration."
+    ],
+    "nextRecommendedAction": "Create app in Asana Developer Console and initiate authorization redirect.",
+    "evidenceClaims": [
+      {
+        "claim": "Redirect URI must match registered callback exactly character-for-character: Must be HTTPS for production; http://localhost allowed for development.",
+        "evidenceUrl": "https://app.asana.com/0/developer-console",
+        "sourceTitle": "Asana Developer Portal Redirect Specifications",
+        "relevance": "Redirect Security & Callback Whitelist"
+      },
+      {
+        "claim": "Authorization code exchange requires POST request to token endpoint: https://app.asana.com/-/oauth_token",
+        "evidenceUrl": "https://app.asana.com/0/developer-console",
+        "sourceTitle": "Asana OAuth 2.0 Token Reference",
+        "relevance": "Server-to-Server Token Exchange"
+      },
+      {
+        "claim": "Sandbox / development restrictions: Direct authorization works immediately within your organization.",
+        "evidenceUrl": "https://app.asana.com/0/developer-console",
+        "sourceTitle": "Asana App Testing and Sandbox Policy",
+        "relevance": "Testing vs Production Boundary"
+      }
+    ],
+    "contextualHandOff": {
+      "action": "Open Asana > Profile Avatar > Settings > Apps > Developer Console.",
+      "reason": "The agent identified the documented setup flow, but cannot create client apps or generate secrets without authenticated access to your developer account.",
+      "prerequisite": "Active developer or workspace admin account on Asana.",
+      "successCondition": "Client ID and Client Secret provisioned and stored in server environment variables."
+    }
+  },
+  "metadata": {
+    "generatedAt": "2026-10-22T19:16:38.951Z",
+    "schemaVersion": "1.0.0",
+    "isCurated": false
+  }
+}

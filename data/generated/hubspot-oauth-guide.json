@@ -1,0 +1,333 @@
+{
+  "id": "guide_hubspot",
+  "slug": "hubspot-oauth-guide",
+  "provider": {
+    "name": "HubSpot",
+    "officialWebsite": "https://hubspot.com",
+    "developerPortal": "https://developers.hubspot.com",
+    "authMethod": "OAuth 2.0 (Authorization Code Grant)",
+    "managedOAuthAvailable": true,
+    "category": "CRM & Marketing Automation"
+  },
+  "readiness": {
+    "difficulty": "Moderate",
+    "handsOnEffort": "25–40 minutes",
+    "externalWaitingTime": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "providerSetupTime": "10–15 minutes (developer console registration & secret generation)",
+    "integrationTestingTime": "15–25 minutes (redirect handler & code-for-token exchange)",
+    "externalReviewTime": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "readinessStatus": "Blocked by prerequisite",
+    "importantBeforeYouStart": "Confirm whether your integration is for internal workspace members (Apps can be installed in developer test portals immediately. Production customer portals require verified scopes.) or multi-tenant public distribution. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+    "launchBlockers": [
+      "Registering an application in HubSpot developer portal requires an active developer account (mandatory prerequisite before setup can begin).",
+      "Console location: HubSpot Developer Account > Manage Apps > Create App > Auth tab.",
+      "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development."
+    ],
+    "structuredBlockers": [
+      {
+        "whatIsBlocked": "Developer App Registration in HubSpot",
+        "whenItApplies": "Initial setup before Client ID and Secret can be provisioned",
+        "howToResolve": "Sign in at https://developers.hubspot.com and navigate to: \"HubSpot Developer Account > Manage Apps > Create App > Auth tab\"."
+      },
+      {
+        "whatIsBlocked": "Authorization Redirect Handshake",
+        "whenItApplies": "During user authorization redirect flow",
+        "howToResolve": "Ensure redirect_uri matches rule character-for-character: Must match the URI registered with the provider. Use http://localhost:3000 for local development testing or strict HTTPS for deployed applications."
+      },
+      {
+        "whatIsBlocked": "Public Multi-Tenant Distribution",
+        "whenItApplies": "App Marketplace listing requires security check, listing review, and verified domains.",
+        "howToResolve": "Prepare documentation (App Marketplace Listing Submission, Terms of Service URL, Privacy Policy URL) before publishing."
+      }
+    ]
+  },
+  "prerequisites": [
+    {
+      "category": "Account Access",
+      "description": "Free HubSpot Developer Account (standard HubSpot customer portal accounts cannot create public OAuth apps; mandatory prerequisite before setup can begin).",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Required to access HubSpot developer console and create OAuth client credentials.",
+      "unblocksStepNumbers": [
+        1,
+        2
+      ]
+    },
+    {
+      "category": "Domain & URLs",
+      "description": "Test portal account for sandbox verification.",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Provider sends authorization code to this pre-registered callback URL.",
+      "localExceptions": "http://localhost with custom port is permitted for local development.",
+      "unblocksStepNumbers": [
+        3
+      ]
+    },
+    {
+      "category": "Project Setup",
+      "description": "Redirect URI (registered with HubSpot; HTTPS generally required for deployed applications, localhost allowed for local development).",
+      "required": false,
+      "requirementLevel": "Conditional",
+      "whyNeeded": "Needed for testing application features and scope selection.",
+      "localExceptions": "http://localhost:3000 supported for local testing; production requires HTTPS.",
+      "unblocksStepNumbers": [
+        4
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "title": "Access HubSpot Developer Dashboard",
+      "purpose": "Establish application identity and access developer credentials.",
+      "whereToGo": "https://developers.hubspot.com > \"HubSpot Developer Account > Manage Apps > Create App > Auth tab\"",
+      "instructions": "Navigate to https://developers.hubspot.com. Sign in and go to: \"HubSpot Developer Account > Manage Apps > Create App > Auth tab\".",
+      "inputsRequired": [
+        "Developer account login credentials"
+      ],
+      "expectedOutcome": "Developer console active at https://developers.hubspot.com.",
+      "howToVerify": "Confirm browser loads the developer dashboard at \"HubSpot Developer Account > Manage Apps > Create App > Auth tab\".",
+      "sourceUrl": "https://developers.hubspot.com",
+      "evidenceStatus": "Documented",
+      "dependencies": []
+    },
+    {
+      "stepNumber": 2,
+      "title": "Register New OAuth Application in HubSpot",
+      "purpose": "Registers your client identity with the authorization server.",
+      "whereToGo": "https://developers.hubspot.com > \"Developer Portal > Apps > \"Create app\"\"",
+      "instructions": "Click \"Developer Portal > Apps > \"Create app\"\". Complete the registration form fields: App name, Description, Logo, Auth Tab: Redirect URLs, Scopes.",
+      "inputsRequired": [
+        "App name",
+        "Description",
+        "Logo",
+        "Auth Tab: Redirect URLs, Scopes"
+      ],
+      "expectedOutcome": "Application created in developer console. Client ID is generated.",
+      "howToVerify": "Verify application entry appears in dashboard with generated Client ID.",
+      "sourceUrl": "https://developers.hubspot.com",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "title": "Configure Authorized Redirect URIs",
+      "purpose": "Prevents authorization code interception by locking callbacks to your server.",
+      "whereToGo": "https://developers.hubspot.com > App Settings > Redirect Settings",
+      "instructions": "In the redirect settings, enter your callback URL. For local development, enter your local callback URL (e.g. \"http://localhost:3000/api/auth/callback/hubspot\"). Note: This example uses http://localhost:3000/ exclusively for local development testing, which HubSpot permits without SSL. For deployed staging and production applications, HTTPS is strictly mandatory and must match the registered domain character-for-character. Save changes.",
+      "inputsRequired": [
+        "Authorized Redirect URI"
+      ],
+      "expectedOutcome": "Redirect URI whitelist saved.",
+      "howToVerify": "Confirm saved redirect URI appears under whitelisted callbacks with exact matching protocol.",
+      "sourceUrl": "https://developers.hubspot.com",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "title": "Select Permission Scopes & Secure Client Secret",
+      "purpose": "Configures granular API access permissions and obtains server credentials.",
+      "whereToGo": "https://developers.hubspot.com > App Credentials",
+      "instructions": "Retrieve your Client ID and generate your Client Secret. Supported scopes: crm.objects.contacts.read (Read CRM contacts and company associations.), crm.objects.contacts.write (Create and update contacts and lifecycle stages.), crm.objects.deals.read (Read deal pipelines, stages, and revenue metrics.), crm.schemas.custom.read (Read custom CRM object schemas.). Scope location rule: Configured in the \"Auth\" tab of the app settings under \"Scopes\".. Store Client Secret in backend environment variables.",
+      "inputsRequired": [
+        "Client ID",
+        "Client Secret",
+        "Selected Scopes"
+      ],
+      "expectedOutcome": "Client Secret securely placed in server environment.",
+      "howToVerify": "Verify Client Secret string is copied and referenced in server .env without exposing in client code.",
+      "sourceUrl": "https://developers.hubspot.com",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ],
+      "commandOrSnippet": "HUBSPOT_CLIENT_ID=\"your_client_id_here\"\nHUBSPOT_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\n# Note: http://localhost:3000 is used for local development testing only; deployed production applications require HTTPS\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback\""
+    },
+    {
+      "stepNumber": 5,
+      "title": "Implement HubSpot Authorization & Token Exchange",
+      "purpose": "Complete standard OAuth 2.0 (Authorization Code Grant) flow.",
+      "whereToGo": "Backend Callback Route & Client Auth Redirect Handler",
+      "instructions": "Direct users to authorization endpoint: \"https://app.hubspot.com/oauth/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}&scope=crm.objects.contacts.read%20crm.objects.contacts.write\". Exchange authorization code by POSTing to token endpoint: \"https://api.hubspot.com/oauth/v1/token\".",
+      "inputsRequired": [
+        "client_id",
+        "client_secret",
+        "authorization_code"
+      ],
+      "expectedOutcome": "Server receives JSON payload containing access_token, token_type: Bearer, and expiration.",
+      "howToVerify": "Execute test code exchange and verify response JSON has 200 OK with valid access_token.",
+      "sourceUrl": "https://developers.hubspot.com",
+      "evidenceStatus": "Configuration Checked",
+      "dependencies": [
+        3,
+        4
+      ]
+    }
+  ],
+  "verification": {
+    "testingModeSupported": true,
+    "testingRestrictions": "Apps can be installed in developer test portals immediately. Production customer portals require verified scopes.",
+    "verificationTriggers": [
+      "App Marketplace listing requires security check, listing review, and verified domains."
+    ],
+    "requiredDocumentation": [
+      "App Marketplace Listing Submission",
+      "Terms of Service URL",
+      "Privacy Policy URL"
+    ],
+    "publishedReviewTimelines": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "unknowns": [
+      "App Marketplace review queue duration and security audit SLA are not confirmed in official docs."
+    ],
+    "testingPossibleNow": true,
+    "testingEnvironmentDetails": "Apps can be installed in developer test portals immediately. Production customer portals require verified scopes.",
+    "additionalProductionRequirements": "App Marketplace listing requires security check, listing review, and verified domains.",
+    "marketplaceReviewApplicable": false,
+    "reviewTriggerExplanation": "App Marketplace listing requires security check, listing review, and verified domains.",
+    "timelineEvidence": {
+      "publishedEstimate": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+      "sourceUrl": "https://developers.hubspot.com",
+      "dateChecked": "Not confirmed in official documentation for this app and distribution path",
+      "isGuarantee": false,
+      "timelineNotes": "Official HubSpot documentation notes an initial 10 business day review for marketplace listings, but overall certification and listing review timelines are not guaranteed and vary widely (up to 60 days). Direct portal installs require zero review (0 days). Review timeline is not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch."
+    },
+    "launchChecklist": [
+      {
+        "checkItem": "Confirm whether a privacy policy is required",
+        "condition": "Required when distributing to external users or requesting user personal data.",
+        "actionRequired": "Host an HTTPS public privacy policy and register the URL in developer app settings.",
+        "evidenceSourceUrl": "https://developers.hubspot.com",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether requested scopes need review",
+        "condition": "Required if requesting sensitive or administrative permissions beyond basic read.",
+        "actionRequired": "Audit scope selections (crm.objects.contacts.read, crm.objects.contacts.write) against least-privilege standards.",
+        "evidenceSourceUrl": "https://developers.hubspot.com",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether public distribution requires approval",
+        "condition": "Required if listing on the official marketplace or distributing to third-party workspaces.",
+        "actionRequired": "Prepare submission assets (App Marketplace Listing Submission, Terms of Service URL, Privacy Policy URL) prior to publishing.",
+        "evidenceSourceUrl": "https://developers.hubspot.com",
+        "isMandatory": false
+      }
+    ]
+  },
+  "troubleshooting": [
+    {
+      "errorCode": "BAD_SCOPES",
+      "description": "Requested scope not enabled in the app configuration inside the HubSpot Developer Portal.",
+      "probableCauses": [
+        "Scope was added to code request without selecting it in the developer portal Auth tab."
+      ],
+      "resolution": "Go to HubSpot Developer Dashboard > Apps > Auth > Scopes and check the box for the requested scope.",
+      "verifiedInTesting": true,
+      "symptom": "Requested scope not enabled in the app configuration inside the HubSpot Developer Portal.",
+      "diagnosis": "Inspect request parameters against console configuration: Scope was added to code request without selecting it in the developer portal Auth tab.",
+      "verification": "Retry authorization request and confirm expected OAuth code or token response is returned.",
+      "escalationPath": "Capture provider error code and request details, excluding client secrets and access tokens, then consult HubSpot developer docs.",
+      "troubleshootingStatus": "Documented"
+    }
+  ],
+  "agentFindings": {
+    "sourcesConsulted": [
+      {
+        "title": "HubSpot Developer Portal: Official OAuth Workflow & Account Setup",
+        "url": "https://developers.hubspot.com"
+      },
+      {
+        "title": "Working with OAuth - HubSpot docs",
+        "url": "https://developers.hubspot.com/docs/api/working-with-oauth"
+      }
+    ],
+    "requirementsExtractedSummary": [
+      "Auth Method: OAuth 2.0 (Authorization Code Grant)",
+      "Developer Console: https://developers.hubspot.com",
+      "Console Navigation: HubSpot Developer Account > Manage Apps > Create App > Auth tab",
+      "Supported Scopes: crm.objects.contacts.read, crm.objects.contacts.write, crm.objects.deals.read, crm.schemas.custom.read"
+    ],
+    "configurationChecksPerformed": [
+      "Verified official domain hubspot.com",
+      "Inspected developer portal navigation: HubSpot Developer Account > Manage Apps > Create App > Auth tab",
+      "Validated token endpoint: https://api.hubspot.com/oauth/v1/token"
+    ],
+    "testsAttempted": [
+      {
+        "test": "OIDC/OAuth RFC 8414 Discovery Document Reachability Check",
+        "endpoint": "https://hubspot.com/.well-known/openid-configuration",
+        "status": "Informational",
+        "observedResult": "The discovery request returned HTTP 406; standard discovery support remains unconfirmed.",
+        "whyChecked": "Verify whether the provider exposes an RFC 8414 or OpenID Connect metadata document via standard GET request.",
+        "whatItEstablishes": "The discovery request returned HTTP 406 to an application/json request.",
+        "whatItDoesNotEstablish": "Does not prove that the provider lacks standard discovery support or OIDC compatibility; standard discovery support remains unconfirmed."
+      },
+      {
+        "test": "Developer Portal Reachability Check",
+        "endpoint": "https://developers.hubspot.com",
+        "status": "Success",
+        "observedResult": "HTTP 200. Portal is active and reachable via TLS/HTTPS.",
+        "whyChecked": "Verify developer portal is live and accessible over public internet.",
+        "whatItEstablishes": "Confirms developer console is accessible and reachable without network blocking.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Authorization URL Parameter-Format & URL-Construction Check",
+        "endpoint": "https://hubspot.com/oauth/authorize",
+        "status": "Success",
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 (S256) syntax specifications.",
+        "whyChecked": "Validate authorization URL query parameter format, query encoding, and URL construction structure.",
+        "whatItEstablishes": "Confirms authorization request syntax adheres to OAuth 2.0 and PKCE RFC standards.",
+        "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
+      }
+    ],
+    "unverifiedClaims": [
+      "Exact marketplace review queue turnaround time for public listings is not guaranteed in official documentation."
+    ],
+    "humanActionRequired": [
+      "Register a free HubSpot Developer Account at https://developers.hubspot.com.",
+      "Create App > Auth Tab > Add Redirect URL and select required CRM scopes.",
+      "Save Client ID and Client Secret in backend env."
+    ],
+    "nextRecommendedAction": "Create test portal in HubSpot Developer Account and execute authorization test.",
+    "evidenceClaims": [
+      {
+        "claim": "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+        "evidenceUrl": "https://developers.hubspot.com",
+        "sourceTitle": "HubSpot Developer Portal Redirect Specifications",
+        "relevance": "Redirect Security & Callback Whitelist"
+      },
+      {
+        "claim": "Authorization code exchange requires POST request to token endpoint: https://api.hubspot.com/oauth/v1/token",
+        "evidenceUrl": "https://developers.hubspot.com",
+        "sourceTitle": "HubSpot OAuth 2.0 Token Reference",
+        "relevance": "Server-to-Server Token Exchange"
+      },
+      {
+        "claim": "Sandbox / development restrictions: Apps can be installed in developer test portals immediately. Production customer portals require verified scopes.",
+        "evidenceUrl": "https://developers.hubspot.com",
+        "sourceTitle": "HubSpot App Testing and Sandbox Policy",
+        "relevance": "Testing vs Production Boundary"
+      }
+    ],
+    "contextualHandOff": {
+      "action": "Register a free HubSpot Developer Account at https://developers.hubspot.com.",
+      "reason": "The agent identified the documented setup flow, but cannot create client apps or generate secrets without authenticated access to your developer account.",
+      "prerequisite": "Active developer or workspace admin account on HubSpot.",
+      "successCondition": "Client ID and Client Secret provisioned and stored in server environment variables."
+    }
+  },
+  "metadata": {
+    "generatedAt": "2026-10-22T19:16:30.915Z",
+    "updatedAt": "2026-10-23T02:00:00.000Z",
+    "schemaVersion": "1.0.0",
+    "isCurated": false
+  }
+}

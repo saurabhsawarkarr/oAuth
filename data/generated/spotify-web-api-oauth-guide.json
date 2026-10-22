@@ -1,0 +1,348 @@
+{
+  "id": "guide_spotify_web_api",
+  "slug": "spotify-web-api-oauth-guide",
+  "provider": {
+    "name": "Spotify Web API",
+    "officialWebsite": "https://spotify.com",
+    "developerPortal": "https://developer.spotify.com/dashboard",
+    "authMethod": "OAuth 2.0 (Authorization Code Flow with PKCE)",
+    "managedOAuthAvailable": true,
+    "category": "Media & Audio Streaming"
+  },
+  "readiness": {
+    "difficulty": "Moderate",
+    "handsOnEffort": "25–40 minutes",
+    "externalWaitingTime": "Immediate (0 days) in Development mode for up to 25 users; ~10–14 business days for quota extension approval.",
+    "providerSetupTime": "10–15 minutes (developer console registration & secret generation)",
+    "integrationTestingTime": "15–25 minutes (redirect handler & code-for-token exchange)",
+    "externalReviewTime": "Immediate (0 days) in Development mode for up to 25 users; ~10–14 business days for quota extension approval.",
+    "readinessStatus": "Blocked by prerequisite",
+    "importantBeforeYouStart": "Confirm whether your integration is for internal workspace members (Development mode strictly limits authorization to up to 25 explicitly invited Spotify accounts registered under \"User Management\" tab in dashboard.) or multi-tenant public distribution. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+    "launchBlockers": [
+      "Registering an application in Spotify Web API developer portal requires an active developer account (mandatory prerequisite before setup can begin).",
+      "Console location: Spotify Developer Dashboard > Dashboard > Create App > Settings.",
+      "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development."
+    ],
+    "structuredBlockers": [
+      {
+        "whatIsBlocked": "Developer App Registration in Spotify Web API",
+        "whenItApplies": "Initial setup before Client ID and Secret can be provisioned",
+        "howToResolve": "Sign in at https://developer.spotify.com/dashboard and navigate to: \"Spotify Developer Dashboard > Dashboard > Create App > Settings\"."
+      },
+      {
+        "whatIsBlocked": "Authorization Redirect Handshake",
+        "whenItApplies": "During user authorization redirect flow",
+        "howToResolve": "Ensure redirect_uri matches rule character-for-character: Must be explicitly added to App Settings > Redirect URIs. Strict HTTPS required for production; http://localhost allowed."
+      },
+      {
+        "whatIsBlocked": "Public Multi-Tenant Distribution",
+        "whenItApplies": "Exceeding 25 users requires requesting a Quota Extension through the Developer Dashboard.",
+        "howToResolve": "Prepare documentation (Working demo or test account credentials, Detailed explanation of why each requested scope is needed) before publishing."
+      }
+    ]
+  },
+  "prerequisites": [
+    {
+      "category": "Account Access",
+      "description": "Spotify account (Free or Premium) verified with email.",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Required to access Spotify Web API developer console and create OAuth client credentials.",
+      "unblocksStepNumbers": [
+        1,
+        2
+      ]
+    },
+    {
+      "category": "Domain & URLs",
+      "description": "Acceptance of Spotify Developer Terms of Service.",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Provider sends authorization code to this pre-registered callback URL.",
+      "localExceptions": "http://localhost with custom port is permitted for local development.",
+      "unblocksStepNumbers": [
+        3
+      ]
+    },
+    {
+      "category": "Project Setup",
+      "description": "Registered Redirect URI (http://localhost:3000/api/auth/callback/spotify supported).",
+      "required": false,
+      "requirementLevel": "Conditional",
+      "whyNeeded": "Needed for testing application features and scope selection.",
+      "unblocksStepNumbers": [
+        4
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "title": "Access Spotify Web API Developer Dashboard",
+      "purpose": "Establish application identity and access developer credentials.",
+      "whereToGo": "https://developer.spotify.com/dashboard > \"Spotify Developer Dashboard > Dashboard > Create App > Settings\"",
+      "instructions": "Navigate to https://developer.spotify.com/dashboard. Sign in and go to: \"Spotify Developer Dashboard > Dashboard > Create App > Settings\".",
+      "inputsRequired": [
+        "Developer account login credentials"
+      ],
+      "expectedOutcome": "Developer console active at https://developer.spotify.com/dashboard.",
+      "howToVerify": "Confirm browser loads the developer dashboard at \"Spotify Developer Dashboard > Dashboard > Create App > Settings\".",
+      "sourceUrl": "https://developer.spotify.com/dashboard",
+      "evidenceStatus": "Documented",
+      "dependencies": []
+    },
+    {
+      "stepNumber": 2,
+      "title": "Register New OAuth Application in Spotify Web API",
+      "purpose": "Registers your client identity with the authorization server.",
+      "whereToGo": "https://developer.spotify.com/dashboard > \"developer.spotify.com/dashboard > \"Create App\"\"",
+      "instructions": "Click \"developer.spotify.com/dashboard > \"Create App\"\". Complete the registration form fields: App name, App description, Website, Redirect URIs, API/SDK choice: \"Web API\".",
+      "inputsRequired": [
+        "App name",
+        "App description",
+        "Website",
+        "Redirect URIs",
+        "API/SDK choice: \"Web API\""
+      ],
+      "expectedOutcome": "Application created in developer console. Client ID is generated.",
+      "howToVerify": "Verify application entry appears in dashboard with generated Client ID.",
+      "sourceUrl": "https://developer.spotify.com/dashboard",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "title": "Configure Authorized Redirect URIs",
+      "purpose": "Prevents authorization code interception by locking callbacks to your server.",
+      "whereToGo": "https://developer.spotify.com/dashboard > App Settings > Redirect Settings",
+      "instructions": "In the redirect settings, enter your callback URL (e.g. \"http://localhost:3000/api/auth/callback/spotify\"). Note: The example uses http://localhost:3000 for local development testing. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type. Save changes.",
+      "inputsRequired": [
+        "Authorized Redirect URI"
+      ],
+      "expectedOutcome": "Redirect URI whitelist saved.",
+      "howToVerify": "Confirm saved redirect URI appears under whitelisted callbacks with exact matching protocol.",
+      "sourceUrl": "https://developer.spotify.com/dashboard",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "title": "Select Permission Scopes & Secure Client Secret",
+      "purpose": "Configures granular API access permissions and obtains server credentials.",
+      "whereToGo": "https://developer.spotify.com/dashboard > App Credentials",
+      "instructions": "Retrieve your Client ID and generate your Client Secret. Supported scopes: user-read-private (Access user account country, product subscription level, and profile details.), user-read-email (Access user email address verified with Spotify.), playlist-read-private (Read private playlists created by the user.), playlist-modify-public (Create and modify public playlists on user behalf.), user-top-read (Read user top artists and tracks based on listening history.). Scope location rule: Scopes are dynamically requested during user redirect via scope query parameter.. Store Client Secret in backend environment variables.",
+      "inputsRequired": [
+        "Client ID",
+        "Client Secret",
+        "Selected Scopes"
+      ],
+      "expectedOutcome": "Client Secret securely placed in server environment.",
+      "howToVerify": "Verify Client Secret string is copied and referenced in server .env without exposing in client code.",
+      "sourceUrl": "https://developer.spotify.com/dashboard",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ],
+      "commandOrSnippet": "SPOTIFY_WEB_API_CLIENT_ID=\"your_client_id_here\"\nSPOTIFY_WEB_API_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\n# Note: http://localhost:3000 is used for local development testing only; deployed production applications require HTTPS\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback\""
+    },
+    {
+      "stepNumber": 5,
+      "title": "Implement Spotify Web API Authorization & Token Exchange",
+      "purpose": "Complete standard OAuth 2.0 (Authorization Code Flow with PKCE) flow.",
+      "whereToGo": "Backend Callback Route & Client Auth Redirect Handler",
+      "instructions": "Direct users to authorization endpoint: \"https://accounts.spotify.com/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}&scope=user-read-private%20user-read-email\". Exchange authorization code by POSTing to token endpoint: \"https://accounts.spotify.com/api/token\".",
+      "inputsRequired": [
+        "client_id",
+        "client_secret",
+        "authorization_code"
+      ],
+      "expectedOutcome": "Server receives JSON payload containing access_token, token_type: Bearer, and expiration.",
+      "howToVerify": "Execute test code exchange and verify response JSON has 200 OK with valid access_token.",
+      "sourceUrl": "https://developer.spotify.com/dashboard",
+      "evidenceStatus": "Configuration Checked",
+      "dependencies": [
+        3,
+        4
+      ]
+    }
+  ],
+  "verification": {
+    "testingModeSupported": true,
+    "testingRestrictions": "Development mode strictly limits authorization to up to 25 explicitly invited Spotify accounts registered under \"User Management\" tab in dashboard.",
+    "verificationTriggers": [
+      "Exceeding 25 users requires requesting a Quota Extension through the Developer Dashboard.",
+      "Commercial applications require Spotify Developer Review and approval."
+    ],
+    "requiredDocumentation": [
+      "Working demo or test account credentials",
+      "Detailed explanation of why each requested scope is needed"
+    ],
+    "publishedReviewTimelines": "Immediate (0 days) in Development mode for up to 25 users; ~10–14 business days for quota extension approval.",
+    "unknowns": [],
+    "testingPossibleNow": true,
+    "testingEnvironmentDetails": "Development mode strictly limits authorization to up to 25 explicitly invited Spotify accounts registered under \"User Management\" tab in dashboard.",
+    "additionalProductionRequirements": "Exceeding 25 users requires requesting a Quota Extension through the Developer Dashboard.; Commercial applications require Spotify Developer Review and approval.",
+    "marketplaceReviewApplicable": false,
+    "reviewTriggerExplanation": "Exceeding 25 users requires requesting a Quota Extension through the Developer Dashboard.",
+    "timelineEvidence": {
+      "publishedEstimate": "Immediate (0 days) in Development mode for up to 25 users; ~10–14 business days for quota extension approval.",
+      "sourceUrl": "https://developer.spotify.com/dashboard",
+      "dateChecked": "Verified via official developer portal documentation",
+      "isGuarantee": false,
+      "timelineNotes": "Review duration represents guidance from provider documentation; queues vary during peak security audit periods."
+    },
+    "launchChecklist": [
+      {
+        "checkItem": "Confirm whether a privacy policy is required",
+        "condition": "Required when distributing to external users or requesting user personal data.",
+        "actionRequired": "Host an HTTPS public privacy policy and register the URL in developer app settings.",
+        "evidenceSourceUrl": "https://developer.spotify.com/dashboard",
+        "isMandatory": false
+      },
+      {
+        "checkItem": "Confirm whether requested scopes need review",
+        "condition": "Required if requesting sensitive or administrative permissions beyond basic read.",
+        "actionRequired": "Audit scope selections (user-read-private, user-read-email) against least-privilege standards.",
+        "evidenceSourceUrl": "https://developer.spotify.com/dashboard",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether public distribution requires approval",
+        "condition": "Required if listing on the official marketplace or distributing to third-party workspaces.",
+        "actionRequired": "Prepare submission assets (Working demo or test account credentials, Detailed explanation of why each requested scope is needed) prior to publishing.",
+        "evidenceSourceUrl": "https://developer.spotify.com/dashboard",
+        "isMandatory": false
+      }
+    ]
+  },
+  "troubleshooting": [
+    {
+      "errorCode": "INVALID_CLIENT: Invalid redirect URI",
+      "description": "The redirect_uri parameter in your request has not been added to the whitelist in Spotify Developer Dashboard.",
+      "probableCauses": [
+        "Missing URI in dashboard",
+        "Trailing slash mismatch",
+        "Encoding issues in redirect_uri parameter."
+      ],
+      "resolution": "Open developer.spotify.com/dashboard > Select App > Settings > Add your exact callback URL to Redirect URIs and click Save.",
+      "verifiedInTesting": true,
+      "symptom": "The redirect_uri parameter in your request has not been added to the whitelist in Spotify Developer Dashboard.",
+      "diagnosis": "Inspect request parameters against console configuration: Missing URI in dashboard; Trailing slash mismatch; Encoding issues in redirect_uri parameter.",
+      "verification": "Retry authorization request and confirm expected OAuth code or token response is returned.",
+      "escalationPath": "Capture provider error code and request details, excluding client secrets and access tokens, then consult Spotify Web API developer docs.",
+      "troubleshootingStatus": "Documented"
+    },
+    {
+      "errorCode": "User not registered in Developer Dashboard (Development Mode)",
+      "description": "Non-whitelisted user attempted to authorize an app running in Development mode.",
+      "probableCauses": [
+        "App is in Development mode and user email is not in User Management list."
+      ],
+      "resolution": "Go to Spotify Dashboard > App > User Management > Add the user email and name, or request Quota Extension.",
+      "verifiedInTesting": true,
+      "symptom": "Non-whitelisted user attempted to authorize an app running in Development mode.",
+      "diagnosis": "Inspect request parameters against console configuration: App is in Development mode and user email is not in User Management list.",
+      "verification": "Retry authorization request and confirm expected OAuth code or token response is returned.",
+      "escalationPath": "Capture provider error code and request details, excluding client secrets and access tokens, then consult Spotify Web API developer docs.",
+      "troubleshootingStatus": "Documented"
+    }
+  ],
+  "agentFindings": {
+    "sourcesConsulted": [
+      {
+        "title": "Spotify Web API Developer Portal: Official OAuth Workflow & Account Setup",
+        "url": "https://developer.spotify.com/dashboard"
+      },
+      {
+        "title": "Authorization Code with PKCE Flow | Spotify for Developers",
+        "url": "https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow"
+      },
+      {
+        "title": "Scopes | Spotify for Developers",
+        "url": "https://developer.spotify.com/documentation/web-api/concepts/scopes"
+      }
+    ],
+    "requirementsExtractedSummary": [
+      "Auth Method: OAuth 2.0 (Authorization Code Flow with PKCE)",
+      "Developer Console: https://developer.spotify.com/dashboard",
+      "Console Navigation: Spotify Developer Dashboard > Dashboard > Create App > Settings",
+      "Supported Scopes: user-read-private, user-read-email, playlist-read-private, playlist-modify-public, user-top-read"
+    ],
+    "configurationChecksPerformed": [
+      "Verified official domain spotify.com",
+      "Inspected developer portal navigation: Spotify Developer Dashboard > Dashboard > Create App > Settings",
+      "Validated token endpoint: https://accounts.spotify.com/api/token"
+    ],
+    "testsAttempted": [
+      {
+        "test": "OIDC/OAuth RFC 8414 Discovery Document Reachability Check",
+        "endpoint": "https://spotify.com/.well-known/openid-configuration",
+        "status": "Informational",
+        "observedResult": "HTTP 404. Provider does not expose public .well-known/openid-configuration; uses custom developer documentation endpoints.",
+        "whyChecked": "Verify OIDC/RFC 8414 metadata reachability and standard TLS handshake.",
+        "whatItEstablishes": "Confirms provider discovery metadata is live, responding, and conforms to RFC 8414 specifications.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Developer Portal Reachability Check",
+        "endpoint": "https://developer.spotify.com/dashboard",
+        "status": "Success",
+        "observedResult": "HTTP 200. Portal is active and reachable via TLS/HTTPS.",
+        "whyChecked": "Verify developer portal is live and accessible over public internet.",
+        "whatItEstablishes": "Confirms developer console is accessible and reachable without network blocking.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Authorization URL Parameter-Format & URL-Construction Check",
+        "endpoint": "https://spotify.com/oauth/authorize",
+        "status": "Success",
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 (S256) syntax specifications.",
+        "whyChecked": "Validate authorization URL query parameter format, query encoding, and URL construction structure.",
+        "whatItEstablishes": "Confirms authorization request syntax adheres to OAuth 2.0 RFC standards.",
+        "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
+      }
+    ],
+    "unverifiedClaims": [],
+    "humanActionRequired": [
+      "Log in to https://developer.spotify.com/dashboard and click \"Create App\".",
+      "Go to App Settings > Add http://localhost:3000/api/auth/callback/spotify to Redirect URIs and click Save.",
+      "Copy Client ID and click \"View client secret\" to copy Client Secret into backend .env."
+    ],
+    "nextRecommendedAction": "Add redirect URI to Spotify Developer Dashboard and test PKCE authorization flow on localhost:3000.",
+    "evidenceClaims": [
+      {
+        "claim": "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+        "evidenceUrl": "https://developer.spotify.com/dashboard",
+        "sourceTitle": "Spotify Web API Developer Portal Redirect Specifications",
+        "relevance": "Redirect Security & Callback Whitelist"
+      },
+      {
+        "claim": "Authorization code exchange requires POST request to token endpoint: https://accounts.spotify.com/api/token",
+        "evidenceUrl": "https://developer.spotify.com/dashboard",
+        "sourceTitle": "Spotify Web API OAuth 2.0 Token Reference",
+        "relevance": "Server-to-Server Token Exchange"
+      },
+      {
+        "claim": "Sandbox / development restrictions: Development mode strictly limits authorization to up to 25 explicitly invited Spotify accounts registered under \"User Management\" tab in dashboard.",
+        "evidenceUrl": "https://developer.spotify.com/dashboard",
+        "sourceTitle": "Spotify Web API App Testing and Sandbox Policy",
+        "relevance": "Testing vs Production Boundary"
+      }
+    ],
+    "contextualHandOff": {
+      "action": "Log in to https://developer.spotify.com/dashboard and click \"Create App\".",
+      "reason": "The agent identified the documented setup flow, but cannot create client apps or generate secrets without authenticated access to your developer account.",
+      "prerequisite": "Active developer or workspace admin account on Spotify Web API.",
+      "successCondition": "Client ID and Client Secret provisioned and stored in server environment variables."
+    }
+  },
+  "metadata": {
+    "generatedAt": "2026-10-22T20:14:01.709Z",
+    "schemaVersion": "1.0.0",
+    "isCurated": false
+  }
+}

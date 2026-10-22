@@ -1,0 +1,33 @@
+{
+  "name": "oauth-setup-guide-agent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:pipeline": "tsx test-research.mjs",
+    "test:stream": "node test-endpoint.mjs",
+    "test:redaction": "tsx test-redaction.mjs",
+    "test:e2e": "tsx test-e2e-suite.mjs",
+    "test:all": "npm run test:redaction && npm run test:pipeline && npm run test:e2e && npm run test:stream"
+  },
+  "dependencies": {
+    "@google/genai": "^2.30.0",
+    "@google/generative-ai": "^0.24.1",
+    "cheerio": "^1.0.0",
+    "lucide-react": "^0.475.0",
+    "next": "^15.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.7.3"
+  }
+}

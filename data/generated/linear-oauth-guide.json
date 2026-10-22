@@ -1,0 +1,347 @@
+{
+  "id": "guide_linear",
+  "slug": "linear-oauth-guide",
+  "provider": {
+    "name": "Linear",
+    "officialWebsite": "https://linear.app",
+    "developerPortal": "https://linear.app/settings/api",
+    "authMethod": "OAuth 2.0 (Authorization Code Grant with PKCE)",
+    "managedOAuthAvailable": true,
+    "category": "Issue Tracking & Project Management"
+  },
+  "readiness": {
+    "difficulty": "Moderate",
+    "handsOnEffort": "25–40 minutes",
+    "externalWaitingTime": "0 days for direct team authorization; 3–5 business days for official Integrations Directory review.",
+    "providerSetupTime": "10–15 minutes (developer console registration & secret generation)",
+    "integrationTestingTime": "15–25 minutes (redirect handler & code-for-token exchange)",
+    "externalReviewTime": "0 days for direct team authorization; 3–5 business days for official Integrations Directory review.",
+    "readinessStatus": "Blocked by prerequisite",
+    "importantBeforeYouStart": "Confirm whether your integration is for internal workspace members (Internal workspace members can authorize the app immediately without review. Public multi-tenant distribution requires external user acceptance.) or multi-tenant public distribution. Must match registered callback URLs exactly. Localhost with any port (e.g. http://localhost:3000/callback) is permitted for dev.",
+    "launchBlockers": [
+      "Registering an application in Linear developer portal requires an active developer account.",
+      "Console location: Workspace Settings > Security & Access > API > Your OAuth Applications.",
+      "Redirect URIs must match: Must match registered callback URLs exactly. Localhost with any port (e.g. http://localhost:3000/callback) is permitted for dev."
+    ],
+    "structuredBlockers": [
+      {
+        "whatIsBlocked": "Developer App Registration in Linear",
+        "whenItApplies": "Initial setup before Client ID and Secret can be provisioned",
+        "howToResolve": "Sign in at https://linear.app/settings/api and navigate to: \"Workspace Settings > Security & Access > API > Your OAuth Applications\"."
+      },
+      {
+        "whatIsBlocked": "Authorization Redirect Handshake",
+        "whenItApplies": "During user authorization redirect flow",
+        "howToResolve": "Ensure redirect_uri matches rule character-for-character: Must match registered callback URLs exactly. Localhost with any port (e.g. http://localhost:3000/callback) is permitted for dev."
+      },
+      {
+        "whatIsBlocked": "Public Multi-Tenant Distribution",
+        "whenItApplies": "Publishing app to the official Linear Integrations Directory requires submission and brand review.",
+        "howToResolve": "Prepare documentation (Public Privacy Policy URL, Support Contact Email, Application Demo Video (for Directory listing)) before publishing."
+      }
+    ]
+  },
+  "prerequisites": [
+    {
+      "category": "Account Access",
+      "description": "Active Linear workspace account with Admin permissions to register OAuth apps.",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Required to access Linear developer console and create OAuth client credentials.",
+      "unblocksStepNumbers": [
+        1,
+        2
+      ]
+    },
+    {
+      "category": "Domain & URLs",
+      "description": "Configured redirect URI (localhost with custom ports fully supported).",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Provider sends authorization code to this pre-registered callback URL.",
+      "localExceptions": "http://localhost with custom port is permitted for local development.",
+      "unblocksStepNumbers": [
+        3
+      ]
+    },
+    {
+      "category": "Project Setup",
+      "description": "Dedicated application name, description, and client icon (512x512px).",
+      "required": false,
+      "requirementLevel": "Conditional",
+      "whyNeeded": "Needed for testing application features and scope selection.",
+      "unblocksStepNumbers": [
+        4
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "title": "Access Linear Developer Dashboard",
+      "purpose": "Establish application identity and access developer credentials.",
+      "whereToGo": "https://linear.app/settings/api > \"Workspace Settings > Security & Access > API > Your OAuth Applications\"",
+      "instructions": "Navigate to https://linear.app/settings/api. Sign in and go to: \"Workspace Settings > Security & Access > API > Your OAuth Applications\".",
+      "inputsRequired": [
+        "Developer account login credentials"
+      ],
+      "expectedOutcome": "Developer console active at https://linear.app/settings/api.",
+      "howToVerify": "Confirm browser loads the developer dashboard at \"Workspace Settings > Security & Access > API > Your OAuth Applications\".",
+      "sourceUrl": "https://linear.app/settings/api",
+      "evidenceStatus": "Documented",
+      "dependencies": []
+    },
+    {
+      "stepNumber": 2,
+      "title": "Register New OAuth Application in Linear",
+      "purpose": "Registers your client identity with the authorization server.",
+      "whereToGo": "https://linear.app/settings/api > \"Linear Web App > Settings > API > \"+ New Application\"\"",
+      "instructions": "Click \"Linear Web App > Settings > API > \"+ New Application\"\". Complete the registration form fields: Application Name, Developer Website URL, Callback URLs, Public Application checkbox.",
+      "inputsRequired": [
+        "Application Name",
+        "Developer Website URL",
+        "Callback URLs",
+        "Public Application checkbox"
+      ],
+      "expectedOutcome": "Application created in developer console. Client ID is generated.",
+      "howToVerify": "Verify application entry appears in dashboard with generated Client ID.",
+      "sourceUrl": "https://linear.app/settings/api",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "title": "Configure Authorized Redirect URIs",
+      "purpose": "Prevents authorization code interception by locking callbacks to your server.",
+      "whereToGo": "https://linear.app/settings/api > App Settings > Redirect Settings",
+      "instructions": "In the redirect settings, enter your callback URL. For local development, enter your local callback URL (e.g. \"http://localhost:3000/api/auth/callback/linear\"). Note: The example uses http://localhost:3000 exclusively for local development testing; deployed staging and production applications require HTTPS matching the registered domain character-for-character. Must match registered callback URLs exactly. Localhost with any port (e.g. http://localhost:3000/callback) is permitted for dev.. Save changes.",
+      "inputsRequired": [
+        "Authorized Redirect URI"
+      ],
+      "expectedOutcome": "Redirect URI whitelist saved.",
+      "howToVerify": "Confirm saved redirect URI appears under whitelisted callbacks with exact matching protocol.",
+      "sourceUrl": "https://linear.app/settings/api",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "title": "Select Permission Scopes & Secure Client Secret",
+      "purpose": "Configures granular API access permissions and obtains server credentials.",
+      "whereToGo": "https://linear.app/settings/api > App Credentials",
+      "instructions": "Retrieve your Client ID and generate your Client Secret. Supported scopes: read (Read-only access to organization issues, comments, projects, and cycles.), write (Full create and update access to issues, attachments, comments, and project states.), issues:create (Granular scope allowing solely creation of new customer issues.), comments:create (Permits posting comments to issues without reading workspace history.), admin (Manage organization-level workspace settings and integrations.). Scope location rule: Linear configures scopes at authorization time via the scope query parameter.. Store Client Secret in backend environment variables.",
+      "inputsRequired": [
+        "Client ID",
+        "Client Secret",
+        "Selected Scopes"
+      ],
+      "expectedOutcome": "Client Secret securely placed in server environment.",
+      "howToVerify": "Verify Client Secret string is copied and referenced in server .env without exposing in client code.",
+      "sourceUrl": "https://linear.app/settings/api",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ],
+      "commandOrSnippet": "LINEAR_CLIENT_ID=\"your_client_id_here\"\nLINEAR_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\n# Note: http://localhost:3000 is used for local development testing only; deployed production applications require HTTPS\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback\""
+    },
+    {
+      "stepNumber": 5,
+      "title": "Implement Linear Authorization & Token Exchange",
+      "purpose": "Complete standard OAuth 2.0 (Authorization Code Grant with PKCE) flow.",
+      "whereToGo": "Backend Callback Route & Client Auth Redirect Handler",
+      "instructions": "Direct users to authorization endpoint: \"https://linear.app/oauth/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}&scope=read%20write\". Exchange authorization code by POSTing to token endpoint: \"https://api.linear.app/oauth/token\".",
+      "inputsRequired": [
+        "client_id",
+        "client_secret",
+        "authorization_code"
+      ],
+      "expectedOutcome": "Server receives JSON payload containing access_token, token_type: Bearer, and expiration.",
+      "howToVerify": "Execute test code exchange and verify response JSON has 200 OK with valid access_token.",
+      "sourceUrl": "https://linear.app/settings/api",
+      "evidenceStatus": "Configuration Checked",
+      "dependencies": [
+        3,
+        4
+      ]
+    }
+  ],
+  "verification": {
+    "testingModeSupported": true,
+    "testingRestrictions": "Internal workspace members can authorize the app immediately without review. Public multi-tenant distribution requires external user acceptance.",
+    "verificationTriggers": [
+      "Publishing app to the official Linear Integrations Directory requires submission and brand review.",
+      "Personal/internal use requires zero external review."
+    ],
+    "requiredDocumentation": [
+      "Public Privacy Policy URL",
+      "Support Contact Email",
+      "Application Demo Video (for Directory listing)"
+    ],
+    "publishedReviewTimelines": "0 days for direct team authorization; 3–5 business days for official Integrations Directory review.",
+    "unknowns": [],
+    "testingPossibleNow": true,
+    "testingEnvironmentDetails": "Internal workspace members can authorize the app immediately without review. Public multi-tenant distribution requires external user acceptance.",
+    "additionalProductionRequirements": "Publishing app to the official Linear Integrations Directory requires submission and brand review.; Personal/internal use requires zero external review.",
+    "marketplaceReviewApplicable": false,
+    "reviewTriggerExplanation": "Publishing app to the official Linear Integrations Directory requires submission and brand review.",
+    "timelineEvidence": {
+      "publishedEstimate": "0 days for direct team authorization; 3–5 business days for official Integrations Directory review.",
+      "sourceUrl": "https://linear.app/settings/api",
+      "dateChecked": "Verified via official developer portal documentation",
+      "isGuarantee": false,
+      "timelineNotes": "Review duration represents guidance from provider documentation; queues vary during peak security audit periods."
+    },
+    "launchChecklist": [
+      {
+        "checkItem": "Confirm whether a privacy policy is required",
+        "condition": "Required when distributing to external users or requesting user personal data.",
+        "actionRequired": "Host an HTTPS public privacy policy and register the URL in developer app settings.",
+        "evidenceSourceUrl": "https://linear.app/settings/api",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether requested scopes need review",
+        "condition": "Required if requesting sensitive or administrative permissions beyond basic read.",
+        "actionRequired": "Audit scope selections (read, write) against least-privilege standards.",
+        "evidenceSourceUrl": "https://linear.app/settings/api",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether public distribution requires approval",
+        "condition": "Required if listing on the official marketplace or distributing to third-party workspaces.",
+        "actionRequired": "Prepare submission assets (Public Privacy Policy URL, Support Contact Email, Application Demo Video (for Directory listing)) prior to publishing.",
+        "evidenceSourceUrl": "https://linear.app/settings/api",
+        "isMandatory": false
+      }
+    ]
+  },
+  "troubleshooting": [
+    {
+      "errorCode": "invalid_scope",
+      "description": "The requested scope string contains unrecognized or misspelled Linear permissions.",
+      "probableCauses": [
+        "Requesting scopes with colon errors (e.g., issue:create instead of issues:create)."
+      ],
+      "resolution": "Update the scope query param in your authorization URL to valid Linear scopes: \"read,write\".",
+      "verifiedInTesting": true,
+      "symptom": "The requested scope string contains unrecognized or misspelled Linear permissions.",
+      "diagnosis": "Inspect request parameters against console configuration: Requesting scopes with colon errors (e.g., issue:create instead of issues:create).",
+      "verification": "Retry authorization request and confirm expected OAuth code or token response is returned.",
+      "escalationPath": "Capture provider error code and request details, excluding client secrets and access tokens, then consult Linear developer docs.",
+      "troubleshootingStatus": "Documented"
+    },
+    {
+      "errorCode": "redirect_uri_mismatch",
+      "description": "The redirect_uri query parameter does not match the callback URL registered in Linear settings.",
+      "probableCauses": [
+        "Protocol discrepancy (http vs https)",
+        "Missing port or trailing slash differences."
+      ],
+      "resolution": "Ensure the redirect_uri in your auth request character-for-character matches Linear Settings > API > Callback URLs.",
+      "verifiedInTesting": true,
+      "symptom": "The redirect_uri query parameter does not match the callback URL registered in Linear settings.",
+      "diagnosis": "Inspect request parameters against console configuration: Protocol discrepancy (http vs https); Missing port or trailing slash differences.",
+      "verification": "Retry authorization request and confirm expected OAuth code or token response is returned.",
+      "escalationPath": "Capture provider error code and request details, excluding client secrets and access tokens, then consult Linear developer docs.",
+      "troubleshootingStatus": "Documented"
+    }
+  ],
+  "agentFindings": {
+    "sourcesConsulted": [
+      {
+        "title": "Linear Developer Portal: Official OAuth Workflow & Account Setup",
+        "url": "https://linear.app/settings/api"
+      },
+      {
+        "title": "Linear Developers",
+        "url": "https://developers.linear.app/docs/oauth/authentication"
+      },
+      {
+        "title": "Linear Developers",
+        "url": "https://developers.linear.app/docs/oauth/scopes"
+      }
+    ],
+    "requirementsExtractedSummary": [
+      "Auth Method: OAuth 2.0 (Authorization Code Grant with PKCE)",
+      "Developer Console: https://linear.app/settings/api",
+      "Console Navigation: Workspace Settings > Security & Access > API > Your OAuth Applications",
+      "Supported Scopes: read, write, issues:create, comments:create, admin"
+    ],
+    "configurationChecksPerformed": [
+      "Verified official domain linear.app",
+      "Inspected developer portal navigation: Workspace Settings > Security & Access > API > Your OAuth Applications",
+      "Validated token endpoint: https://api.linear.app/oauth/token"
+    ],
+    "testsAttempted": [
+      {
+        "test": "OIDC/OAuth RFC 8414 Discovery Document Reachability Check",
+        "endpoint": "https://linear.app/.well-known/openid-configuration",
+        "status": "Informational",
+        "observedResult": "HTTP 404. Provider does not expose public .well-known/openid-configuration; uses custom developer documentation endpoints.",
+        "whyChecked": "Verify OIDC/RFC 8414 metadata reachability and standard TLS handshake.",
+        "whatItEstablishes": "Confirms provider discovery metadata is live, responding, and conforms to RFC 8414 specifications.",
+        "whatItDoesNotEstablish": "Does not prove or disprove standard discovery support (reserved for confirmed OIDC metadata endpoints) and does not establish client app registration."
+      },
+      {
+        "test": "Developer Portal Reachability Check",
+        "endpoint": "https://linear.app/settings/api",
+        "status": "Success",
+        "observedResult": "HTTP 200. Portal is active and reachable via TLS/HTTPS.",
+        "whyChecked": "Verify developer portal is live and accessible over public internet.",
+        "whatItEstablishes": "Confirms developer console is accessible and reachable without network blocking.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Authorization URL Parameter-Format & URL-Construction Check",
+        "endpoint": "https://linear.app/oauth/authorize",
+        "status": "Success",
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 S256 parameter syntax.",
+        "whyChecked": "Validate query parameter format, query encoding, and URL construction structure.",
+        "whatItEstablishes": "Confirms authorization query parameter encoding and URL construction adhere to OAuth 2.0 and PKCE syntax specifications.",
+        "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
+      }
+    ],
+    "unverifiedClaims": [],
+    "humanActionRequired": [
+      "Log in to Linear as Workspace Admin and navigate to Settings > API.",
+      "Click \"+ New Application\", register callback URLs, and generate Client Secret.",
+      "Store Client ID and Client Secret in backend environment variables."
+    ],
+    "nextRecommendedAction": "Register your application at https://linear.app/settings/api and run local token exchange on localhost:3000.",
+    "evidenceClaims": [
+      {
+        "claim": "Redirect URI must match registered callback exactly character-for-character: Must match registered callback URLs exactly. Localhost with any port (e.g. http://localhost:3000/callback) is permitted for dev.",
+        "evidenceUrl": "https://linear.app/settings/api",
+        "sourceTitle": "Linear Developer Portal Redirect Specifications",
+        "relevance": "Redirect Security & Callback Whitelist"
+      },
+      {
+        "claim": "Authorization code exchange requires POST request to token endpoint: https://api.linear.app/oauth/token",
+        "evidenceUrl": "https://linear.app/settings/api",
+        "sourceTitle": "Linear OAuth 2.0 Token Reference",
+        "relevance": "Server-to-Server Token Exchange"
+      },
+      {
+        "claim": "Sandbox / development restrictions: Internal workspace members can authorize the app immediately without review. Public multi-tenant distribution requires external user acceptance.",
+        "evidenceUrl": "https://linear.app/settings/api",
+        "sourceTitle": "Linear App Testing and Sandbox Policy",
+        "relevance": "Testing vs Production Boundary"
+      }
+    ],
+    "contextualHandOff": {
+      "action": "Log in to Linear as Workspace Admin and navigate to Settings > API.",
+      "reason": "The agent identified the documented setup flow, but cannot create client apps or generate secrets without authenticated access to your developer account.",
+      "prerequisite": "Active developer or workspace admin account on Linear.",
+      "successCondition": "Client ID and Client Secret provisioned and stored in server environment variables."
+    }
+  },
+  "metadata": {
+    "generatedAt": "2026-10-22T21:03:47.952Z",
+    "schemaVersion": "1.0.0",
+    "isCurated": false
+  }
+}

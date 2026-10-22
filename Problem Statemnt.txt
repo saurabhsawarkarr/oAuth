@@ -1,0 +1,555 @@
+# Product Requirements & Problem Definition
+## OAuth Setup Guide Agent — APM Take-Home Assignment
+
+## 1. Executive Summary
+
+Developers building AI agents and software integrations often need to connect their applications to third-party services such as Gmail, Slack, Notion, GitHub, and other SaaS platforms.
+
+Before users can connect their accounts, developers may need to register and configure an OAuth application with the provider. Depending on the provider, requested permissions, application type, and intended audience, this process may involve configuring credentials, redirect URLs, permission scopes, consent screens, application settings, and verification or approval requirements.
+
+Today, developers often have to navigate multiple documentation pages, understand unfamiliar configuration requirements, identify dependencies, estimate the work involved, and determine whether additional approval is necessary before launching.
+
+The process can be difficult to predict. Developers may not know whether the setup can be completed in an hour, requires several days of preparation, or involves an external review that delays production access.
+
+The proposed product is an **OAuth Setup Guide Agent**: a searchable library of provider-specific setup guides combined with an AI-powered research agent that can investigate unfamiliar apps and generate actionable guides in real time.
+
+The product will help developers understand what they need to do, why each step is necessary, how much effort to expect, what could block progress, and which actions the agent can perform versus those requiring human intervention.
+
+The generated guides will include relevant source links, verification status, observed test results, estimates, and unresolved questions. Each guide will be accessible through a shareable URL so developers can follow or distribute the instructions without additional explanation.
+
+The long-term objective is to support a library of 100 OAuth-supporting apps. For the take-home assignment, the implementation will focus on a small set of real apps with varied setup requirements and a working live-generation flow for unfamiliar apps.
+
+---
+
+## 2. Background and Context
+
+### 2.1 How OAuth fits into application integrations
+
+OAuth 2.0 is an authorization framework that allows an application to obtain limited access to a user's resources without requiring the user to share their account password with that application.
+
+For example, a developer may build an AI agent that summarizes emails. To retrieve a user's Gmail messages, the application must obtain appropriate authorization and request the necessary permissions.
+
+In a typical integration, three distinct elements are involved:
+
+1. **The developer's application:** The product or AI agent being built.
+2. **The provider's OAuth application configuration:** The registration and settings that identify the application to the provider and define how authorization is handled.
+3. **The end user's authorization:** The individual user's decision to grant the application access to specified resources.
+
+The developer generally configures the OAuth application for their product. End users subsequently authorize that application through the provider's authorization flow.
+
+However, the exact requirements differ across providers. Some integration platforms also offer managed OAuth, allowing developers to use a platform-managed application rather than registering their own provider application in supported cases.
+
+### 2.2 Why setup requirements vary
+
+OAuth setup is not a uniform process across all providers.
+
+Depending on the integration, developers may need to:
+
+- Register an application in a provider's developer console.
+- Configure client credentials and redirect URLs.
+- Select the appropriate permissions or scopes.
+- Configure consent and testing settings.
+- Establish verified domains or publish required policy documents.
+- Complete additional verification or security review.
+- Implement and test the authorization flow.
+- Resolve provider-specific errors or account restrictions.
+
+Some apps can be configured and tested relatively quickly. Others introduce additional requirements before the application can be made available to its intended audience.
+
+Not every provider requires all these steps, and some requirements apply only to specific scopes, account types, or production scenarios.
+
+This variation creates a need for reliable, app-specific setup guidance.
+
+---
+
+## 3. Problem Statement
+
+Developers building AI agents and third-party integrations lack a single, reliable way to understand and navigate the OAuth application setup and approval process for an arbitrary provider.
+
+The information they need is often distributed across developer documentation, authentication references, API documentation, application-registration instructions, and verification policies.
+
+Developers must manually discover the relevant sources, determine which requirements apply to their use case, reconstruct the correct sequence of steps, estimate the effort and waiting time, and troubleshoot unfamiliar configuration issues.
+
+This creates uncertainty around three important questions:
+
+- What exactly must be completed before the integration can work?
+- How much time and effort will be required, including any external approval or verification?
+- What could prevent the developer from progressing, and what should they do next?
+
+Existing documentation may explain individual technical requirements without presenting the entire setup journey in a consistent, decision-oriented format.
+
+A static library can help with known apps, but it cannot cover every provider a developer may want to integrate. A generic LLM response may cover common OAuth concepts but can produce outdated, incomplete, or incorrect provider-specific instructions if it does not investigate current sources.
+
+**We need an experience that combines a searchable library of OAuth setup guides with an AI agent that investigates unfamiliar providers, extracts evidence-backed requirements, attempts the setup steps it can safely perform, and produces a clear, actionable, shareable guide.**
+
+The product must help developers understand the expected path to readiness without falsely claiming that a configuration has been tested, an application has been approved, or an uncertain timeline is guaranteed.
+
+---
+
+## 4. Target Users
+
+### Primary user: Developer or AI agent builder
+
+A developer building an application that needs access to a third-party service through OAuth.
+
+Examples include:
+
+- An AI agent that reads or organizes Gmail messages.
+- An assistant that interacts with Notion pages.
+- An application that creates or updates Slack messages.
+- An agent that accesses GitHub repositories.
+- A workflow product that connects to business SaaS applications.
+
+### User's context
+
+The developer understands their own product and the integration they want to build, but may not understand the selected provider's OAuth requirements.
+
+They may be unfamiliar with the provider's developer console, terminology, permission model, verification rules, or publication process.
+
+They need actionable instructions rather than a general explanation of OAuth.
+
+### Secondary user: Teammate or collaborator
+
+A developer may need to share the setup guide with another engineer, founder, or technical teammate who will perform some of the configuration work.
+
+That person should be able to open the guide, understand the requirements, and continue the process without relying on the original developer to explain it.
+
+---
+
+## 5. User Problems and Pain Points
+
+### Problem 1: Difficulty finding the right information
+
+Developers may need to search multiple sources to understand the setup process.
+
+They may encounter general OAuth tutorials, API-specific documentation, provider-specific application setup instructions, and separate verification policies.
+
+**Impact:** Developers spend time discovering and reconciling information before they can begin configuration.
+
+### Problem 2: Uncertainty about the correct setup sequence
+
+Documentation may describe individual settings without making the dependencies between steps obvious.
+
+For example, developers may need to register an application, configure redirect URLs, choose permissions, implement authorization, and then test the flow.
+
+The correct sequence and required settings depend on the provider.
+
+**Impact:** Developers may perform steps in the wrong order, overlook prerequisites, or repeatedly revisit configuration pages.
+
+### Problem 3: Unclear approval requirements and timelines
+
+Developers may not know whether testing is possible immediately, whether production verification is necessary, or whether an external review could delay launch.
+
+Requirements may depend on the permissions requested and the intended audience.
+
+**Impact:** Developers cannot confidently estimate launch readiness or plan their integration work.
+
+### Problem 4: Lack of app-specific troubleshooting
+
+Generic OAuth guidance cannot reliably diagnose every provider-specific issue.
+
+Common problems may involve redirect URI mismatches, invalid client configuration, unsupported scopes, test-user restrictions, or verification requirements.
+
+**Impact:** Developers can become blocked without knowing which setting or requirement needs attention.
+
+### Problem 5: Static documentation does not cover every app
+
+A predefined guide library cannot realistically contain a complete, continuously maintained guide for every possible provider.
+
+When an app is missing, developers must repeat the research process manually.
+
+**Impact:** The product's usefulness is limited to its predefined coverage unless an unfamiliar app can be investigated dynamically.
+
+### Problem 6: Difficulty determining whether instructions are trustworthy
+
+A guide can look complete while containing assumptions, outdated details, or unverified claims.
+
+Documentation evidence and practical test results are also different forms of evidence.
+
+**Impact:** Developers may follow incorrect instructions or assume that a flow works when it has never been tested.
+
+### Problem 7: Unclear division between automation and human work
+
+Some research and validation can be automated. Other steps require credentials, access to a developer account, business information, explicit authorization, or an external provider's decision.
+
+**Impact:** Developers may not know which steps the agent has completed, where it stopped, or what action is required from them.
+
+---
+
+## 6. Product Goal
+
+Build a working experience that enables developers to discover, understand, and progress through the OAuth setup process for supported and unfamiliar applications.
+
+The product should reduce the effort required to research setup requirements, improve clarity about effort and approval dependencies, and provide trustworthy guidance that developers can follow and share.
+
+The product is a setup-research and guidance experience. It is not intended to replace OAuth infrastructure, guarantee provider approval, or automatically complete every provider-console operation.
+
+### Core product outcome
+
+A developer who enters an app name or website should receive a guide that answers:
+
+1. Is the provider and its authentication approach correctly identified?
+2. Where should I start?
+3. What prerequisites and configuration steps are required?
+4. What permissions, settings, or documents may be necessary?
+5. How much hands-on effort should I expect?
+6. Is external verification or approval potentially required?
+7. What can the agent investigate or test?
+8. What remains uncertain or requires my intervention?
+9. What should I do next?
+10. Can I share this guide with someone else?
+
+---
+
+## 7. Core Product Capabilities
+
+### Capability 1: Searchable OAuth Guide Library
+
+The product should provide a searchable library of ready-to-use guides for supported applications.
+
+The long-term target is 100 OAuth-supporting apps. The take-home implementation only needs to demonstrate a few real apps with different setup challenges.
+
+Users should be able to:
+
+- Search for an app by name.
+- Select an app and open its setup guide.
+- Understand whether managed OAuth is available or whether custom credentials may be required.
+- Review setup difficulty, estimated effort, likely waiting time, and prerequisites.
+- Follow ordered setup instructions.
+- Review relevant official documentation.
+- Understand potential approval requirements and blockers.
+- Identify the next action.
+- Share the guide with another developer.
+
+The library should prioritize accurate and useful guidance over the number of apps included in the demonstration.
+
+### Capability 2: Live Guide Generation for Unfamiliar Apps
+
+Users should be able to submit the name or website of an app that is not already in the library.
+
+The system should investigate the provider and generate an app-specific guide in real time.
+
+The research workflow should:
+
+1. Identify the provider and confirm the relevant official website.
+2. Discover official developer documentation and authentication references.
+3. Find application-registration instructions, OAuth configuration requirements, permissions, and applicable verification policies.
+4. Retrieve and inspect relevant pages.
+5. Extract requirements and reconstruct the setup sequence.
+6. Identify dependencies, conditional requirements, and potential blockers.
+7. Estimate hands-on effort and external waiting time, explaining assumptions and uncertainty.
+8. Attempt safe validation or testing where practical.
+9. Record the sources used and the results of any tests attempted.
+10. Generate a structured guide using the standard guide format.
+
+The system should not rely solely on the LLM's pretrained knowledge or return a generic OAuth tutorial.
+
+If official documentation is unavailable, conflicting, or insufficient, the system must identify the gap rather than inventing instructions.
+
+### Capability 3: Standardized, Actionable Guide
+
+Every guide should follow a consistent structure so developers can understand different providers using a familiar format.
+
+#### Section A: Overview and readiness
+
+- App name and confirmed official website.
+- Relevant developer portal.
+- Authentication method.
+- Managed OAuth availability, if applicable.
+- Setup difficulty.
+- Estimated hands-on effort.
+- Likely external waiting time.
+- Important dependencies or launch blockers.
+
+#### Section B: Prerequisites
+
+- Required provider account or developer access.
+- Required application or project setup.
+- Domain and redirect URL requirements, where applicable.
+- Required credentials or permissions.
+- Privacy policy, business details, or other supporting material, if applicable.
+
+#### Section C: Step-by-step setup
+
+For each step, provide:
+
+- Step title.
+- Explanation of what to do.
+- Why the step is necessary.
+- Required inputs or configuration.
+- Expected outcome.
+- Relevant official source link.
+- Dependencies on earlier steps.
+- Whether the instruction has been documented, checked, or tested.
+
+#### Section D: Verification and production readiness
+
+- Whether the authorization flow can be tested.
+- Testing-mode restrictions.
+- Conditions that trigger verification or review.
+- Required supporting information or documentation.
+- Known publication or approval requirements.
+- Published review timelines, where available.
+- Unknowns or requirements that need provider confirmation.
+
+#### Section E: Testing and troubleshooting
+
+- How to validate the authorization flow.
+- Expected successful outcomes.
+- Relevant errors and possible causes.
+- Diagnostic steps and fixes.
+- What was actually tested.
+- What could not be tested.
+
+#### Section F: Agent findings and next actions
+
+- Official sources consulted.
+- Requirements extracted from those sources.
+- Configuration checks performed.
+- Tests attempted and observed results.
+- Remaining uncertainty.
+- Actions that require developer intervention.
+- The next recommended step.
+
+Not every section will contain a confirmed answer for every provider. The system should explicitly identify missing, conditional, or inapplicable information.
+
+### Capability 4: Evidence and Verification
+
+The product should make the evidence behind the guide visible.
+
+It must distinguish among:
+
+- **Documented:** Supported by an identified source.
+- **Configuration checked:** Checked against the documented requirements or available configuration.
+- **Tested:** A practical test was attempted, with the outcome recorded.
+- **Estimated:** Based on documented requirements, observed work, or explicit assumptions.
+- **Unverified:** Not confirmed.
+- **Blocked:** Requires human action, account access, credentials, or external approval.
+
+The system should attach sources to important provider-specific claims.
+
+A valid source link does not prove that the associated setup step was tested. Similarly, a successful test does not establish that production approval has been granted.
+
+The product must not misrepresent the evidence it has collected.
+
+### Capability 5: Shareable Guides
+
+Each generated guide should have a URL that another developer can open and follow.
+
+The shared guide should preserve:
+
+- Provider identity.
+- Setup instructions.
+- Relevant source links.
+- Estimates and assumptions.
+- Verification status.
+- Observed test results.
+- Known limitations.
+- Next actions.
+
+The guide should be understandable without the original user explaining it.
+
+Sensitive credentials, access tokens, client secrets, or private account data must not be included in a publicly shareable guide.
+
+---
+
+## 8. AI Agent Research and Validation Workflow
+
+The agent is the central component of the live-generation experience.
+
+### Stage 1: Input and identification
+
+Accept an app name or website.
+
+Confirm that the input corresponds to a real provider and identify the relevant developer portal. If the identity is ambiguous, request clarification or clearly state the identification uncertainty.
+
+### Stage 2: Source discovery
+
+Search for relevant official documentation, including:
+
+- Developer portal.
+- OAuth or authentication documentation.
+- Application-registration instructions.
+- API permissions and scopes.
+- Authorization and token flow documentation.
+- App verification and publication policies.
+
+Record source URLs and identify which claims each source supports.
+
+### Stage 3: Information extraction
+
+Extract the provider-specific facts needed for the guide.
+
+These may include:
+
+- Application registration requirements.
+- Client credential requirements.
+- Redirect URL constraints.
+- Authorization and token endpoints, where relevant.
+- Required scopes.
+- Consent and testing settings.
+- Verification conditions.
+- Required documents.
+- Known setup restrictions.
+
+The agent must distinguish confirmed facts from inferences and assumptions.
+
+### Stage 4: Workflow reconstruction
+
+Convert the extracted requirements into ordered steps.
+
+Identify dependencies, prerequisites, conditional steps, and actions requiring external approval.
+
+The workflow should be based on the provider's actual documented requirements rather than a generic OAuth template.
+
+### Stage 5: Practical validation
+
+Attempt safe checks that are feasible without unnecessary credentials, account access, or risky external actions.
+
+Depending on the provider, this may include:
+
+- Checking that relevant documentation supports the required settings.
+- Validating the structure of configuration values.
+- Inspecting an authorization URL.
+- Running an authorized test flow, if suitable test credentials are available.
+
+Record the exact checks attempted and their outcomes.
+
+If the agent cannot complete a step, it should explain why and identify the next action required.
+
+### Stage 6: Guide generation
+
+Populate the standardized guide with:
+
+- App-specific instructions.
+- Evidence and citations.
+- Estimated effort and waiting time.
+- Conditional approval requirements.
+- Troubleshooting guidance.
+- Verification status.
+- Human handoff points.
+- Next actions.
+
+### Stage 7: Guide delivery
+
+Display the guide in a readable format and provide a shareable URL.
+
+The live-generation experience should make it clear that the guide was researched for the submitted app, rather than selected from a predefined list.
+
+---
+
+## 9. Time and Effort Estimation
+
+Time estimates are a core requirement because developers need to understand the potential commitment before starting.
+
+The product should distinguish:
+
+**Hands-on effort:** The estimated time spent completing configuration, implementing the flow, and running tests.
+
+**External waiting time:** Time spent waiting for provider review, verification, or another external dependency.
+
+**Total expected timeline:** A qualified estimate of how long the process may take, accounting for the applicable prerequisites and external dependencies.
+
+Estimates should be based on evidence where possible, such as documented requirements, observed setup attempts, or clearly explained assumptions.
+
+If the provider does not publish a review timeline, the guide should say so. It should not fabricate an exact duration or present an estimate as a guaranteed approval date.
+
+---
+
+## 10. Out of Scope for the Take-Home
+
+To fit the 6–8-hour budget, the initial implementation will not attempt to:
+
+- Populate all 100 guides.
+- Support every OAuth provider or authentication method.
+- Complete provider approval on behalf of developers.
+- Guarantee production readiness.
+- Automate every private developer-console interaction.
+- Require paid accounts or completed provider approvals.
+- Build a full OAuth connection infrastructure platform.
+- Implement an elaborate multi-agent architecture without a demonstrated need.
+
+The focus is a convincing, working slice that demonstrates the research-to-guide workflow.
+
+---
+
+## 11. Success Criteria
+
+The MVP will be considered successful when it demonstrates the following:
+
+### Library experience
+
+- A developer can search and select several real apps.
+- Each selected app has an app-specific guide.
+- The guides represent varied setup requirements.
+
+### Live research
+
+- A developer can submit an app not already in the library.
+- The system performs live research using relevant sources.
+- The generated guide contains provider-specific instructions rather than generic OAuth content.
+- Important claims have relevant evidence or explicit uncertainty labels.
+
+### Actionability
+
+- The guide explains prerequisites and ordered setup steps.
+- It addresses effort, waiting time, approval requirements, and likely blockers.
+- It identifies the next action and where the developer must take over.
+
+### Validation
+
+- A sample of the guidance is checked against real sources or setup attempts.
+- The submission shows what was tested, what was learned or corrected, and what remains unverified.
+
+### Sharing and delivery
+
+- The guide can be opened through a shareable URL.
+- The source repository is available.
+- A README explains setup instructions, key product decisions, and limitations.
+
+### Trustworthiness
+
+- The system does not invent provider requirements or approval timelines.
+- It does not claim tests succeeded when they were not performed.
+- It keeps credentials and secrets out of shared guides.
+
+---
+
+## 12. Proposed Evaluation Metrics
+
+The assignment does not prescribe numerical targets, so the initial evaluation should focus on observable quality.
+
+1. **Guide completeness:** Are all applicable sections populated or explicitly marked unknown?
+2. **Evidence coverage:** Are important provider-specific requirements supported by relevant sources?
+3. **Instruction accuracy:** Do the instructions agree with the official documentation and observed tests?
+4. **Live-generation success:** Can the agent produce a useful guide for an unfamiliar app?
+5. **Actionability:** Can a developer identify the next step without additional explanation?
+6. **Research latency:** How long does live guide generation take?
+7. **Shareability:** Can another developer access and follow the generated guide?
+
+These metrics can be used to identify weaknesses in the prototype and guide subsequent improvements.
+
+---
+
+## 13. Key Product Decisions
+
+The initial implementation will follow these principles:
+
+- **Evidence before confidence:** Provider-specific claims should be supported by research or explicitly marked uncertain.
+- **Consistent structure, dynamic content:** Every guide follows the same schema, but the steps and requirements depend on the provider.
+- **Useful over exhaustive:** A few reliable guides are preferable to a large collection of unverified ones.
+- **Automation with clear boundaries:** The agent attempts what it can safely do and explains where human action is required.
+- **No false promises:** The product estimates effort and explains approval dependencies without guaranteeing outcomes.
+- **Focused execution:** The architecture should remain simple enough to build and demonstrate within the assignment budget.
+
+---
+
+## 14. Final Product Definition
+
+The OAuth Setup Guide Agent is a searchable guide library and live AI research experience that helps developers understand and navigate the OAuth application setup and approval process for third-party integrations.
+
+It combines provider-specific documentation, structured requirements extraction, practical validation, effort estimation, troubleshooting, and shareable instructions.
+
+Its primary value is not simply explaining OAuth. It is reducing the uncertainty and fragmented research involved in getting an individual integration ready, while making it clear what is known, what has been tested, and what the developer still needs to do.
+
+The take-home implementation will demonstrate this through a small library of varied real applications, live generation for an unfamiliar app, evidence-backed guidance, a shareable result, and a reproducible repository with setup instructions and limitations.

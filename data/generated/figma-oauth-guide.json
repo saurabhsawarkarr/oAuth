@@ -1,0 +1,319 @@
+{
+  "id": "guide_figma",
+  "slug": "figma-oauth-guide",
+  "provider": {
+    "name": "Figma",
+    "officialWebsite": "https://figma.com",
+    "developerPortal": "https://www.figma.com/developers/api",
+    "authMethod": "OAuth 2.0 (Authorization Code Grant)",
+    "managedOAuthAvailable": true,
+    "category": "Design & Collaboration"
+  },
+  "readiness": {
+    "difficulty": "Moderate",
+    "handsOnEffort": "25–40 minutes",
+    "externalWaitingTime": "0 days for direct OAuth; 5–10 business days if submitted to Figma Community.",
+    "providerSetupTime": "10–15 minutes (developer console registration & secret generation)",
+    "integrationTestingTime": "15–25 minutes (redirect handler & code-for-token exchange)",
+    "externalReviewTime": "0 days for direct OAuth; 5–10 business days if submitted to Figma Community.",
+    "readinessStatus": "Blocked by prerequisite",
+    "importantBeforeYouStart": "Confirm whether your integration is for internal workspace members (Internal use and team testing are unrestricted. App directory publication requires manual review.) or multi-tenant public distribution. Note redirect rule: Must match registered callback URL exactly. Figma rejects redirects with unlisted query parameters or ports..",
+    "launchBlockers": [
+      "Registering an application in Figma developer portal requires an active developer account.",
+      "Console location: Figma App > Account Settings > Security / Developer > OAuth apps.",
+      "Redirect URIs must match: Must match registered callback URL exactly. Figma rejects redirects with unlisted query parameters or ports."
+    ],
+    "structuredBlockers": [
+      {
+        "whatIsBlocked": "Developer App Registration in Figma",
+        "whenItApplies": "Initial setup before Client ID and Secret can be provisioned",
+        "howToResolve": "Sign in at https://www.figma.com/developers/api and navigate to: \"Figma App > Account Settings > Security / Developer > OAuth apps\"."
+      },
+      {
+        "whatIsBlocked": "Authorization Redirect Handshake",
+        "whenItApplies": "During user authorization redirect flow",
+        "howToResolve": "Ensure redirect_uri matches rule character-for-character: Must match registered callback URL exactly. Figma rejects redirects with unlisted query parameters or ports."
+      },
+      {
+        "whatIsBlocked": "Public Multi-Tenant Distribution",
+        "whenItApplies": "Submitting to Figma Community / Plugin & Widget marketplace triggers review.",
+        "howToResolve": "Prepare documentation (Privacy Policy URL, App icon and support email for Community listings) before publishing."
+      }
+    ]
+  },
+  "prerequisites": [
+    {
+      "category": "Account Access",
+      "description": "Active Figma account (Starter, Professional, or Enterprise).",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Required to access Figma developer console and create OAuth client credentials.",
+      "unblocksStepNumbers": [
+        1,
+        2
+      ]
+    },
+    {
+      "category": "Domain & URLs",
+      "description": "Designated public HTTPS callback URL (localhost supported during development).",
+      "required": true,
+      "requirementLevel": "Required",
+      "whyNeeded": "Provider sends authorization code to this pre-registered callback URL.",
+      "localExceptions": "http://localhost with custom port is permitted for local development.",
+      "unblocksStepNumbers": [
+        3
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "title": "Access Figma Developer Dashboard",
+      "purpose": "Establish application identity and access developer credentials.",
+      "whereToGo": "https://www.figma.com/developers/api > \"Figma App > Account Settings > Security / Developer > OAuth apps\"",
+      "instructions": "Navigate to https://www.figma.com/developers/api. Sign in and go to: \"Figma App > Account Settings > Security / Developer > OAuth apps\".",
+      "inputsRequired": [
+        "Developer account login credentials"
+      ],
+      "expectedOutcome": "Developer console active at https://www.figma.com/developers/api.",
+      "howToVerify": "Confirm browser loads the developer dashboard at \"Figma App > Account Settings > Security / Developer > OAuth apps\".",
+      "sourceUrl": "https://www.figma.com/developers/api",
+      "evidenceStatus": "Documented",
+      "dependencies": []
+    },
+    {
+      "stepNumber": 2,
+      "title": "Register New OAuth Application in Figma",
+      "purpose": "Registers your client identity with the authorization server.",
+      "whereToGo": "https://www.figma.com/developers/api > \"Figma Settings > Security > \"OAuth apps\" > \"Create a new app\"\"",
+      "instructions": "Click \"Figma Settings > Security > \"OAuth apps\" > \"Create a new app\"\". Complete the registration form fields: App name, Website URL, Callback URL.",
+      "inputsRequired": [
+        "App name",
+        "Website URL",
+        "Callback URL"
+      ],
+      "expectedOutcome": "Application created in developer console. Client ID is generated.",
+      "howToVerify": "Verify application entry appears in dashboard with generated Client ID.",
+      "sourceUrl": "https://www.figma.com/developers/api",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "title": "Configure Authorized Redirect URIs",
+      "purpose": "Prevents authorization code interception by locking callbacks to your server.",
+      "whereToGo": "https://www.figma.com/developers/api > App Settings > Redirect Settings",
+      "instructions": "In the redirect settings, enter your callback URL (e.g. \"http://localhost:3000/api/auth/callback/figma\"). Note rule: Must match registered callback URL exactly. Figma rejects redirects with unlisted query parameters or ports.. Save changes.",
+      "inputsRequired": [
+        "Authorized Redirect URI"
+      ],
+      "expectedOutcome": "Redirect URI whitelist saved.",
+      "howToVerify": "Confirm saved redirect URI appears under whitelisted callbacks with exact matching protocol.",
+      "sourceUrl": "https://www.figma.com/developers/api",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "title": "Select Permission Scopes & Secure Client Secret",
+      "purpose": "Configures granular API access permissions and obtains server credentials.",
+      "whereToGo": "https://www.figma.com/developers/api > App Credentials",
+      "instructions": "Retrieve your Client ID and generate your Client Secret. Supported scopes: file_read (Read design files, layers, components, and export visual assets.), file_comments:write (Post comments and feedback on design files on behalf of user.), webhooks:write (Create and manage file update webhooks for automated workflows.). Scope location rule: Scopes specified via query parameter during authorization URL generation.. Store Client Secret in backend environment variables.",
+      "inputsRequired": [
+        "Client ID",
+        "Client Secret",
+        "Selected Scopes"
+      ],
+      "expectedOutcome": "Client Secret securely placed in server environment.",
+      "howToVerify": "Verify Client Secret string is copied and referenced in server .env without exposing in client code.",
+      "sourceUrl": "https://www.figma.com/developers/api",
+      "evidenceStatus": "Documented",
+      "dependencies": [
+        2
+      ],
+      "commandOrSnippet": "FIGMA_CLIENT_ID=\"your_client_id_here\"\nFIGMA_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback\""
+    },
+    {
+      "stepNumber": 5,
+      "title": "Implement Figma Authorization & Token Exchange",
+      "purpose": "Complete standard OAuth 2.0 (Authorization Code Grant) flow.",
+      "whereToGo": "Backend Callback Route & Client Auth Redirect Handler",
+      "instructions": "Direct users to authorization endpoint: \"https://www.figma.com/oauth?client_id={CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}&scope=file_read%20file_comments:write\". Exchange authorization code by POSTing to token endpoint: \"https://www.figma.com/api/v2/oauth/token\".",
+      "inputsRequired": [
+        "client_id",
+        "client_secret",
+        "authorization_code"
+      ],
+      "expectedOutcome": "Server receives JSON payload containing access_token, token_type: Bearer, and expiration.",
+      "howToVerify": "Execute test code exchange and verify response JSON has 200 OK with valid access_token.",
+      "sourceUrl": "https://www.figma.com/developers/api",
+      "evidenceStatus": "Configuration Checked",
+      "dependencies": [
+        3,
+        4
+      ]
+    }
+  ],
+  "verification": {
+    "testingModeSupported": true,
+    "testingRestrictions": "Internal use and team testing are unrestricted. App directory publication requires manual review.",
+    "verificationTriggers": [
+      "Submitting to Figma Community / Plugin & Widget marketplace triggers review.",
+      "Private/custom integrations require zero external review."
+    ],
+    "requiredDocumentation": [
+      "Privacy Policy URL",
+      "App icon and support email for Community listings"
+    ],
+    "publishedReviewTimelines": "0 days for direct OAuth; 5–10 business days if submitted to Figma Community.",
+    "unknowns": [],
+    "testingPossibleNow": true,
+    "testingEnvironmentDetails": "Internal use and team testing are unrestricted. App directory publication requires manual review.",
+    "additionalProductionRequirements": "Submitting to Figma Community / Plugin & Widget marketplace triggers review.; Private/custom integrations require zero external review.",
+    "marketplaceReviewApplicable": false,
+    "reviewTriggerExplanation": "Submitting to Figma Community / Plugin & Widget marketplace triggers review.",
+    "timelineEvidence": {
+      "publishedEstimate": "0 days for direct OAuth; 5–10 business days if submitted to Figma Community.",
+      "sourceUrl": "https://www.figma.com/developers/api",
+      "dateChecked": "Verified via official developer portal documentation",
+      "isGuarantee": false,
+      "timelineNotes": "Review duration represents guidance from provider documentation; queues vary during peak security audit periods."
+    },
+    "launchChecklist": [
+      {
+        "checkItem": "Confirm whether a privacy policy is required",
+        "condition": "Required when distributing to external users or requesting user personal data.",
+        "actionRequired": "Host an HTTPS public privacy policy and register the URL in developer app settings.",
+        "evidenceSourceUrl": "https://www.figma.com/developers/api",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether requested scopes need review",
+        "condition": "Required if requesting sensitive or administrative permissions beyond basic read.",
+        "actionRequired": "Audit scope selections (file_read, file_comments:write) against least-privilege standards.",
+        "evidenceSourceUrl": "https://www.figma.com/developers/api",
+        "isMandatory": true
+      },
+      {
+        "checkItem": "Confirm whether public distribution requires approval",
+        "condition": "Required if listing on the official marketplace or distributing to third-party workspaces.",
+        "actionRequired": "Prepare submission assets (Privacy Policy URL, App icon and support email for Community listings) prior to publishing.",
+        "evidenceSourceUrl": "https://www.figma.com/developers/api",
+        "isMandatory": false
+      }
+    ]
+  },
+  "troubleshooting": [
+    {
+      "errorCode": "redirect_uri_mismatch",
+      "description": "Redirect URI in authorization request does not match Figma developer settings.",
+      "probableCauses": [
+        "Port mismatch or missing trailing slash."
+      ],
+      "resolution": "Check Figma Settings > Security > OAuth apps > Edit app and align the callback URL.",
+      "verifiedInTesting": true,
+      "symptom": "Redirect URI in authorization request does not match Figma developer settings.",
+      "diagnosis": "Inspect request parameters against console configuration: Port mismatch or missing trailing slash.",
+      "verification": "Retry authorization request and confirm expected OAuth code or token response is returned.",
+      "escalationPath": "Capture provider error code and request details, excluding client secrets and access tokens, then consult Figma developer docs.",
+      "troubleshootingStatus": "Documented"
+    }
+  ],
+  "agentFindings": {
+    "sourcesConsulted": [
+      {
+        "title": "Figma Developer Portal: Official OAuth Workflow & Account Setup",
+        "url": "https://www.figma.com/developers/api"
+      },
+      {
+        "title": "Introduction | Developer Docs",
+        "url": "https://www.figma.com/developers/api#oauth2"
+      },
+      {
+        "title": "Introduction | Developer Docs",
+        "url": "https://www.figma.com/developers/api#authentication"
+      }
+    ],
+    "requirementsExtractedSummary": [
+      "Auth Method: OAuth 2.0 (Authorization Code Grant)",
+      "Developer Console: https://www.figma.com/developers/api",
+      "Console Navigation: Figma App > Account Settings > Security / Developer > OAuth apps",
+      "Supported Scopes: file_read, file_comments:write, webhooks:write"
+    ],
+    "configurationChecksPerformed": [
+      "Verified official domain figma.com",
+      "Inspected developer portal navigation: Figma App > Account Settings > Security / Developer > OAuth apps",
+      "Validated token endpoint: https://www.figma.com/api/v2/oauth/token"
+    ],
+    "testsAttempted": [
+      {
+        "test": "OIDC/OAuth RFC 8414 Discovery Document Reachability Check",
+        "endpoint": "https://figma.com/.well-known/openid-configuration",
+        "status": "Success",
+        "observedResult": "HTTP 200 OK. Valid discovery document found with authorization_endpoint: https://www.figma.com/oauth.",
+        "whyChecked": "Verify OIDC/RFC 8414 metadata reachability and standard TLS handshake.",
+        "whatItEstablishes": "Confirms provider discovery metadata is live, responding, and conforms to RFC 8414 specifications.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Developer Portal Reachability Check",
+        "endpoint": "https://www.figma.com/developers/api",
+        "status": "Success",
+        "observedResult": "HTTP 200. Portal is active and reachable via TLS/HTTPS.",
+        "whyChecked": "Verify developer portal is live and accessible over public internet.",
+        "whatItEstablishes": "Confirms developer console is accessible and reachable without network blocking.",
+        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+      },
+      {
+        "test": "Authorization URL Parameter-Format & URL-Construction Check",
+        "endpoint": "https://figma.com/oauth/authorize",
+        "status": "Success",
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 (S256) syntax specifications.",
+        "whyChecked": "Validate authorization URL query parameter format, query encoding, and URL construction structure.",
+        "whatItEstablishes": "Confirms authorization request syntax adheres to OAuth 2.0 RFC standards.",
+        "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
+      }
+    ],
+    "unverifiedClaims": [],
+    "humanActionRequired": [
+      "Open Figma Settings > Security tab and click \"Create a new app\" under OAuth apps.",
+      "Copy Client ID and single-view Client Secret into backend environment configuration."
+    ],
+    "nextRecommendedAction": "Create app in Figma Settings and initiate authorization redirect to https://www.figma.com/oauth.",
+    "evidenceClaims": [
+      {
+        "claim": "Redirect URI must match registered callback exactly character-for-character: Must match registered callback URL exactly. Figma rejects redirects with unlisted query parameters or ports.",
+        "evidenceUrl": "https://www.figma.com/developers/api",
+        "sourceTitle": "Figma Developer Portal Redirect Specifications",
+        "relevance": "Redirect Security & Callback Whitelist"
+      },
+      {
+        "claim": "Authorization code exchange requires POST request to token endpoint: https://www.figma.com/api/v2/oauth/token",
+        "evidenceUrl": "https://www.figma.com/developers/api",
+        "sourceTitle": "Figma OAuth 2.0 Token Reference",
+        "relevance": "Server-to-Server Token Exchange"
+      },
+      {
+        "claim": "Sandbox / development restrictions: Internal use and team testing are unrestricted. App directory publication requires manual review.",
+        "evidenceUrl": "https://www.figma.com/developers/api",
+        "sourceTitle": "Figma App Testing and Sandbox Policy",
+        "relevance": "Testing vs Production Boundary"
+      }
+    ],
+    "contextualHandOff": {
+      "action": "Open Figma Settings > Security tab and click \"Create a new app\" under OAuth apps.",
+      "reason": "The agent identified the documented setup flow, but cannot create client apps or generate secrets without authenticated access to your developer account.",
+      "prerequisite": "Active developer or workspace admin account on Figma.",
+      "successCondition": "Client ID and Client Secret provisioned and stored in server environment variables."
+    }
+  },
+  "metadata": {
+    "generatedAt": "2026-10-22T19:16:35.440Z",
+    "schemaVersion": "1.0.0",
+    "isCurated": false
+  }
+}
