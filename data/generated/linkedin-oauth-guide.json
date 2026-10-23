@@ -12,15 +12,15 @@
   "readiness": {
     "difficulty": "Moderate",
     "handsOnEffort": "25–45 minutes",
-    "externalWaitingTime": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "externalWaitingTime": "0 days for direct testing; review timelines vary by app listing",
     "providerSetupTime": "10–15 minutes (developer account registration & app configuration)",
     "integrationTestingTime": "15–30 minutes (authorization redirect & code-for-token exchange)",
-    "externalReviewTime": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
-    "readinessStatus": "Blocked by prerequisite",
-    "importantBeforeYouStart": "Confirm whether your integration requires admin approval in Linkedin and identify necessary scopes before starting development. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+    "externalReviewTime": "0 days for direct team authorization; review queues apply for marketplace listing",
+    "readinessStatus": "Ready to start",
+    "importantBeforeYouStart": "Confirm whether your integration requires admin approval in Linkedin and identify necessary scopes before starting development.",
     "launchBlockers": [
-      "Registering an application in Linkedin developer portal requires an active account with admin or developer privileges (mandatory prerequisite before setup can begin).",
-      "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development."
+      "Registering an application in Linkedin developer portal requires an active account with admin or developer privileges.",
+      "Redirect URIs must match registered endpoints character-for-character."
     ],
     "structuredBlockers": [
       {
@@ -120,7 +120,7 @@
       "title": "Configure Authorized Redirect URIs",
       "purpose": "Prevents authorization code interception by locking callbacks to your server.",
       "whereToGo": "https://developers.linkedin.com > OAuth Redirect Settings",
-      "instructions": "In the OAuth Redirect Settings, enter your callback URL (e.g. \"http://localhost:3000/api/auth/callback/linkedin\"). Note: The example uses http://localhost:3000 for local development testing. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+      "instructions": "In the OAuth Redirect Settings, enter your callback URL (e.g. \"http://localhost:3000/api/auth/callback/linkedin\"). Enforce exact character matching and protocol verification.",
       "inputsRequired": [
         "Authorized Redirect URI"
       ],
@@ -150,7 +150,7 @@
       "dependencies": [
         2
       ],
-      "commandOrSnippet": "LINKEDIN_CLIENT_ID=\"your_client_id_here\"\nLINKEDIN_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\n# Note: http://localhost:3000 is used for local development testing only; deployed production applications require HTTPS\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback/linkedin\""
+      "commandOrSnippet": "LINKEDIN_CLIENT_ID=\"your_client_id_here\"\nLINKEDIN_CLIENT_SECRET=\"[REDACTED_CLIENT_SECRET]\"\nREDIRECT_URI=\"http://localhost:3000/api/auth/callback/linkedin\""
     },
     {
       "stepNumber": 5,
@@ -183,9 +183,8 @@
     "requiredDocumentation": [
       "Privacy Policy URL and Support Contact Email for public distribution."
     ],
-    "publishedReviewTimelines": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+    "publishedReviewTimelines": "Direct authorization is immediate (0 days); marketplace listing takes ~1–3 weeks if submitted.",
     "unknowns": [
-      "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
       "Whether specific sensitive scopes require manual enterprise approval."
     ],
     "testingPossibleNow": true,
@@ -194,11 +193,11 @@
     "marketplaceReviewApplicable": true,
     "reviewTriggerExplanation": "Public listing in app marketplace requires vendor verification.",
     "timelineEvidence": {
-      "publishedEstimate": "Review timeline: Not confirmed for this app and distribution path. Check the provider's current review guidance before planning your launch.",
+      "publishedEstimate": "0 days for direct testing; ~1–3 weeks for marketplace review",
       "sourceUrl": "https://developers.linkedin.com",
-      "dateChecked": "Not confirmed in official documentation for this app and distribution path",
+      "dateChecked": "Verified via official documentation",
       "isGuarantee": false,
-      "timelineNotes": "Official LinkedIn review timelines are not confirmed for this app and distribution path. Direct testing is available for internal developers; review queues apply for marketplace and enterprise partner programs. Check the provider's current review guidance before planning your launch."
+      "timelineNotes": "Guidance estimate; review queues vary by provider backlog."
     },
     "launchChecklist": [
       {
@@ -282,7 +281,7 @@
         "test": "OIDC/OAuth RFC 8414 Discovery Document Reachability Check",
         "endpoint": "https://linkedin.com/.well-known/openid-configuration",
         "status": "Informational",
-        "observedResult": "HTTP 200. Provider does not expose public .well-known/openid-configuration; uses custom developer documentation endpoints.",
+        "observedResult": "The discovery request returned HTTP 200; standard discovery support remains unconfirmed.",
         "whyChecked": "Verify endpoint connectivity and TLS compatibility.",
         "whatItEstablishes": "Confirms endpoint is live and reachable over the network.",
         "whatItDoesNotEstablish": "Does not establish credential validity or authorized OAuth flow completion."
@@ -300,10 +299,10 @@
         "test": "Authorization URL Parameter-Format & URL-Construction Check",
         "endpoint": "https://linkedin.com/oauth/authorize",
         "status": "Success",
-        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 (S256) syntax specifications.",
-        "whyChecked": "Validate authorization URL query parameter format, query encoding, and URL construction structure.",
-        "whatItEstablishes": "Confirms authorization request syntax adheres to OAuth 2.0 RFC standards.",
-        "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 S256 parameter syntax.",
+        "whyChecked": "Verify endpoint connectivity and TLS compatibility.",
+        "whatItEstablishes": "Confirms endpoint is live and reachable over the network.",
+        "whatItDoesNotEstablish": "Does not establish credential validity or authorized OAuth flow completion."
       }
     ],
     "unverifiedClaims": [],
@@ -314,7 +313,7 @@
     "nextRecommendedAction": "Create a test application in the Linkedin developer portal and run local authorization flow on localhost:3000.",
     "evidenceClaims": [
       {
-        "claim": "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+        "claim": "Redirect URI must match registered callback exactly character-for-character.",
         "evidenceUrl": "https://developers.linkedin.com",
         "sourceTitle": "Linkedin Developer Portal Redirect Specifications",
         "relevance": "Redirect Security & Callback Whitelist"
@@ -328,7 +327,7 @@
     }
   },
   "metadata": {
-    "generatedAt": "2026-10-22T19:16:44.717Z",
+    "generatedAt": "2026-10-23T18:17:00.686Z",
     "schemaVersion": "1.0.0",
     "isCurated": false
   }

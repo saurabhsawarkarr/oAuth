@@ -113,9 +113,9 @@ export default function HomePage() {
               style={{
                 fontSize: '2.75rem',
                 marginBottom: '1rem',
-                background: 'linear-gradient(135deg, #0f172a 0%, #334155 70%, #4f46e5 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'var(--text-primary)',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
               }}
             >
               OAuth Setup Guide Agent
@@ -157,7 +157,7 @@ export default function HomePage() {
               </div>
 
               <div style={{ padding: '1.1rem', background: '#ffffff', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem', color: '#0369a1', fontWeight: 600, fontSize: '0.88rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.88rem' }}>
                   <Layers size={16} />
                   <span>Standard 6-Section Schema</span>
                 </div>

@@ -21,12 +21,12 @@
   --border-focus: #4f46e5;
   --border-glow: rgba(79, 70, 229, 0.2);
 
-  /* Brand Accents - Crisp Indigo & Violet */
+  /* Color 1: Primary Brand Accent - Disciplined Royal Indigo */
   --accent-primary: #4f46e5;
   --accent-primary-hover: #4338ca;
-  --accent-secondary: #7c3aed;
-  --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
-  --accent-gradient-subtle: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+  --accent-secondary: #4338ca;
+  --accent-gradient: #4f46e5;
+  --accent-gradient-subtle: #eef2ff;
 
   /* Text & Typography - High Legibility Slate */
   --text-primary: #0f172a;
@@ -34,30 +34,33 @@
   --text-muted: #64748b;
   --text-invert: #ffffff;
 
-  /* Evidence Badges & Status Tokens - Light Mode Tuned */
-  --status-tested-bg: #ecfdf5;
-  --status-tested-text: #047857;
-  --status-tested-border: #a7f3d0;
+  /* Color 2: Success / Verified - Clean Forest Green */
+  --status-tested-bg: #f0fdf4;
+  --status-tested-text: #15803d;
+  --status-tested-border: #bbf7d0;
 
-  --status-documented-bg: #eff6ff;
-  --status-documented-text: #1d4ed8;
-  --status-documented-border: #bfdbfe;
+  /* Mapped to Primary Indigo */
+  --status-documented-bg: #eef2ff;
+  --status-documented-text: #4338ca;
+  --status-documented-border: #c7d2fe;
 
-  --status-checked-bg: #ecfeff;
-  --status-checked-text: #0e7490;
-  --status-checked-border: #a5f3fc;
+  --status-checked-bg: #eef2ff;
+  --status-checked-text: #4338ca;
+  --status-checked-border: #c7d2fe;
 
-  --status-estimated-bg: #fffbeb;
-  --status-estimated-text: #b45309;
-  --status-estimated-border: #fde68a;
+  /* Mapped to Neutral Slate */
+  --status-estimated-bg: #f8fafc;
+  --status-estimated-text: #475569;
+  --status-estimated-border: #cbd5e1;
 
-  --status-unverified-bg: #fef3c7;
-  --status-unverified-text: #92400e;
-  --status-unverified-border: #fcd34d;
+  /* Color 3: Warning / Blocked / Friction - Warm Amber */
+  --status-unverified-bg: #fffbeb;
+  --status-unverified-text: #b45309;
+  --status-unverified-border: #fde68a;
 
-  --status-blocked-bg: #fef2f2;
-  --status-blocked-text: #b91c1c;
-  --status-blocked-border: #fecaca;
+  --status-blocked-bg: #fffbeb;
+  --status-blocked-text: #b45309;
+  --status-blocked-border: #fde68a;
 
   /* Shadows - Layered Elevation */
   --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
@@ -99,11 +102,6 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--bg-primary);
-  background-image: 
-    radial-gradient(at 15% 15%, rgba(79, 70, 229, 0.06) 0px, transparent 40%),
-    radial-gradient(at 85% 85%, rgba(124, 58, 237, 0.05) 0px, transparent 45%),
-    radial-gradient(at 50% 50%, rgba(248, 250, 252, 0.8) 0px, transparent 100%);
-  background-attachment: fixed;
   overflow-x: hidden;
 }
 
@@ -227,7 +225,7 @@ code, pre, .font-mono {
 }
 
 .brand-badge {
-  background: var(--accent-gradient);
+  background: var(--accent-primary);
   color: white;
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
@@ -273,13 +271,14 @@ code, pre, .font-mono {
 }
 
 .btn-primary {
-  background: var(--accent-gradient);
+  background: var(--accent-primary);
   color: white;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.2);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.38);
+  background: var(--accent-primary-hover);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
   transform: translateY(-1px);
 }
 
@@ -540,9 +539,8 @@ code, pre, .font-mono {
 
 .stepper-progress {
   height: 100%;
-  background: var(--accent-gradient);
+  background: var(--accent-primary);
   transition: width 400ms ease;
-  box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
 }
 
 .step-node {
@@ -578,14 +576,14 @@ code, pre, .font-mono {
   background: #ffffff;
   border-color: var(--accent-primary);
   color: var(--accent-primary);
-  box-shadow: 0 0 16px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 0 12px rgba(79, 70, 229, 0.25);
   animation: pulse-glow 2s infinite ease-in-out;
 }
 
 .step-circle.completed {
-  background: #ecfdf5;
-  border-color: #059669;
-  color: #059669;
+  background: #f0fdf4;
+  border-color: #15803d;
+  color: #15803d;
 }
 
 .step-label {
@@ -601,7 +599,7 @@ code, pre, .font-mono {
 }
 
 .step-label.completed {
-  color: #059669;
+  color: #15803d;
 }
 
 /* Terminal Console Box */
@@ -633,11 +631,8 @@ code, pre, .font-mono {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  background: #334155;
 }
-
-.terminal-dot.red { background: #ef4444; }
-.terminal-dot.yellow { background: #f59e0b; }
-.terminal-dot.green { background: #10b981; }
 
 .terminal-body {
   padding: 1rem;
@@ -654,11 +649,11 @@ code, pre, .font-mono {
   word-break: break-word;
 }
 
-.log-line.info { color: #38bdf8; }
-.log-line.gemini { color: #c084fc; font-weight: 500; }
-.log-line.probe { color: #f59e0b; }
+.log-line.info { color: #94a3b8; }
+.log-line.gemini { color: #818cf8; font-weight: 500; }
+.log-line.probe { color: #cbd5e1; }
 .log-line.success { color: #34d399; font-weight: 600; }
-.log-line.error { color: #f87171; font-weight: 600; }
+.log-line.error { color: #fbbf24; font-weight: 600; }
 
 @keyframes pulse-glow {
   0%, 100% {

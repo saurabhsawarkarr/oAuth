@@ -396,9 +396,9 @@ export const LiveResearchConsole: React.FC<LiveResearchConsoleProps> = ({
           style={{
             padding: '1rem 1.25rem',
             borderRadius: 'var(--radius-md)',
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#b91c1c',
+            background: '#fffbeb',
+            border: '1px solid #fde68a',
+            color: '#b45309',
             display: 'flex',
             alignItems: 'center',
             gap: '0.65rem',
@@ -416,8 +416,8 @@ export const LiveResearchConsole: React.FC<LiveResearchConsoleProps> = ({
           style={{
             padding: '1.5rem',
             borderRadius: 'var(--radius-md)',
-            background: 'linear-gradient(135deg, #ecfdf5 0%, #eef2ff 100%)',
-            border: '1px solid #a7f3d0',
+            background: '#f0fdf4',
+            border: '1px solid #bbf7d0',
             boxShadow: 'var(--shadow-md)',
             display: 'flex',
             justifyContent: 'space-between',
@@ -427,7 +427,7 @@ export const LiveResearchConsole: React.FC<LiveResearchConsoleProps> = ({
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#047857', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.3rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#15803d', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.3rem' }}>
               <CheckCircle2 size={18} />
               <span>Standardized Guide Ready for {generatedGuide.provider.name}</span>
             </div>

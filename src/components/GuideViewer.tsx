@@ -149,30 +149,9 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
       case 'Completed':
         return {
           label: 'Completed',
-          bg: '#ecfdf5',
-          color: '#047857',
-          border: '#a7f3d0',
-        };
-      case 'In progress':
-        return {
-          label: 'In progress',
-          bg: '#eff6ff',
-          color: '#1d4ed8',
-          border: '#bfdbfe',
-        };
-      case 'Configuration checked':
-        return {
-          label: 'Config Checked',
-          bg: '#ecfeff',
-          color: '#0e7490',
-          border: '#a5f3fc',
-        };
-      case 'Documented':
-        return {
-          label: 'Documented',
-          bg: '#f5f3ff',
-          color: '#6d28d9',
-          border: '#ddd6fe',
+          bg: '#f0fdf4',
+          color: '#15803d',
+          border: '#bbf7d0',
         };
       case 'Tested':
         return {
@@ -181,12 +160,33 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
           color: '#15803d',
           border: '#bbf7d0',
         };
+      case 'In progress':
+        return {
+          label: 'In progress',
+          bg: '#eef2ff',
+          color: '#4338ca',
+          border: '#c7d2fe',
+        };
+      case 'Configuration checked':
+        return {
+          label: 'Config Checked',
+          bg: '#eef2ff',
+          color: '#4338ca',
+          border: '#c7d2fe',
+        };
+      case 'Documented':
+        return {
+          label: 'Documented',
+          bg: '#eef2ff',
+          color: '#4338ca',
+          border: '#c7d2fe',
+        };
       case 'Blocked':
         return {
           label: 'Blocked',
-          bg: '#fef2f2',
-          color: '#b91c1c',
-          border: '#fecaca',
+          bg: '#fffbeb',
+          color: '#b45309',
+          border: '#fde68a',
         };
       case 'Not started':
       default:
@@ -390,9 +390,9 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                   gap: '0.45rem',
                   padding: '0.35rem 0.8rem',
                   borderRadius: 'var(--radius-sm)',
-                  background: setupReadinessStatus === 'Ready to begin' ? '#ecfdf5' : '#fef2f2',
-                  border: `1px solid ${setupReadinessStatus === 'Ready to begin' ? '#a7f3d0' : '#fecaca'}`,
-                  color: setupReadinessStatus === 'Ready to begin' ? '#047857' : '#b91c1c',
+                  background: setupReadinessStatus === 'Ready to begin' ? '#f0fdf4' : '#fffbeb',
+                  border: `1px solid ${setupReadinessStatus === 'Ready to begin' ? '#bbf7d0' : '#fde68a'}`,
+                  color: setupReadinessStatus === 'Ready to begin' ? '#15803d' : '#b45309',
                   fontSize: '0.84rem',
                   fontWeight: 700,
                 }}
@@ -401,7 +401,7 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                 {setupReadinessStatus === 'Ready to begin' ? <Zap size={14} /> : <AlertTriangle size={14} />}
                 <span>Setup readiness: {setupReadinessStatus}</span>
               </div>
-              <div style={{ fontSize: '0.73rem', color: setupReadinessStatus === 'Ready to begin' ? '#047857' : '#b91c1c', maxWidth: '320px', textAlign: 'right' }}>
+              <div style={{ fontSize: '0.73rem', color: setupReadinessStatus === 'Ready to begin' ? '#15803d' : '#b45309', maxWidth: '320px', textAlign: 'right' }}>
                 {setupReadinessReason}
               </div>
             </div>
@@ -528,12 +528,12 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
             style={{
               padding: '1.25rem',
               borderRadius: 'var(--radius-md)',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
+              background: '#fffbeb',
+              border: '1px solid #fde68a',
               marginBottom: '1.5rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: '#b91c1c', fontWeight: 700, fontSize: '0.92rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: '#b45309', fontWeight: 700, fontSize: '0.92rem' }}>
               <ShieldAlert size={16} />
               <span>Launch Blockers & Gating Dependencies</span>
             </div>
@@ -544,20 +544,20 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                   style={{
                     padding: '0.85rem 1rem',
                     background: '#ffffff',
-                    border: '1px solid #fee2e2',
+                    border: '1px solid #fde68a',
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.86rem',
                     boxShadow: 'var(--shadow-sm)',
                   }}
                 >
-                  <div style={{ color: '#991b1b', fontWeight: 700, marginBottom: '0.25rem' }}>
+                  <div style={{ color: '#92400e', fontWeight: 700, marginBottom: '0.25rem' }}>
                     • {b.whatIsBlocked}
                   </div>
                   <div style={{ color: '#334155', fontSize: '0.82rem', marginBottom: '0.35rem' }}>
                     <strong style={{ color: 'var(--text-muted)' }}>When it applies:</strong> {b.whenItApplies}
                   </div>
-                  <div style={{ color: '#047857', fontSize: '0.82rem' }}>
-                    <strong style={{ color: '#047857' }}>How to resolve:</strong> {b.howToResolve}
+                  <div style={{ color: '#15803d', fontSize: '0.82rem' }}>
+                    <strong style={{ color: '#15803d' }}>How to resolve:</strong> {b.howToResolve}
                   </div>
                 </div>
               ))}
@@ -568,18 +568,18 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
             style={{
               padding: '1.15rem 1.25rem',
               borderRadius: 'var(--radius-md)',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
+              background: '#fffbeb',
+              border: '1px solid #fde68a',
               marginBottom: '1.5rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', color: '#b91c1c', fontWeight: 600, fontSize: '0.9rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', color: '#b45309', fontWeight: 600, fontSize: '0.9rem' }}>
               <ShieldAlert size={16} />
               <span>Important Launch Blockers & Dependencies</span>
             </div>
             <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               {guide.readiness.launchBlockers.map((blocker, i) => (
-                <li key={i} style={{ fontSize: '0.86rem', color: '#991b1b', lineHeight: '1.5' }}>
+                <li key={i} style={{ fontSize: '0.86rem', color: '#92400e', lineHeight: '1.5' }}>
                   {blocker}
                 </li>
               ))}
@@ -658,8 +658,8 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
               height: '100%',
               background:
                 completedPrereqsCount === totalPrereqs
-                  ? '#059669'
-                  : 'var(--accent-gradient)',
+                  ? '#15803d'
+                  : 'var(--accent-primary)',
               transition: 'width 0.3s ease',
             }}
           />
@@ -690,18 +690,18 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
           <div
             style={{
               padding: '0.85rem 1rem',
-              background: '#ecfdf5',
-              border: '1px solid #a7f3d0',
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
               borderRadius: 'var(--radius-sm)',
               marginBottom: '1.25rem',
               fontSize: '0.84rem',
-              color: '#047857',
+              color: '#15803d',
               display: 'flex',
               alignItems: 'center',
               gap: '0.55rem',
             }}
           >
-            <CheckCircle2 size={16} color="#059669" style={{ flexShrink: 0 }} />
+            <CheckCircle2 size={16} color="#15803d" style={{ flexShrink: 0 }} />
             <div>
               <strong>Mandatory Prerequisites Confirmed:</strong> Developer account access is verified. Setup readiness is <strong>Ready to begin</strong>.
             </div>
@@ -718,10 +718,10 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
 
             const levelBadge =
               level === 'Required'
-                ? { text: 'Required', color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' }
+                ? { text: 'Required', color: '#b45309', bg: '#fffbeb', border: '#fde68a' }
                 : level === 'Conditional'
                 ? { text: 'Conditional', color: '#b45309', bg: '#fffbeb', border: '#fde68a' }
-                : { text: 'Recommended', color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' };
+                : { text: 'Recommended', color: '#4338ca', bg: '#eef2ff', border: '#c7d2fe' };
 
             return (
               <div
@@ -733,8 +733,8 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                   gap: '0.9rem',
                   padding: '1rem',
                   borderRadius: 'var(--radius-md)',
-                  background: isDone ? '#ecfdf5' : '#ffffff',
-                  border: `1px solid ${isDone ? '#a7f3d0' : 'var(--border-subtle)'}`,
+                  background: isDone ? '#f0fdf4' : '#ffffff',
+                  border: `1px solid ${isDone ? '#bbf7d0' : 'var(--border-subtle)'}`,
                   boxShadow: 'var(--shadow-sm)',
                   cursor: 'pointer',
                   transition: 'all var(--transition-fast)',
@@ -747,8 +747,8 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                     width: '20px',
                     height: '20px',
                     borderRadius: '5px',
-                    border: `2px solid ${isDone ? '#059669' : 'var(--border-medium)'}`,
-                    background: isDone ? '#059669' : '#ffffff',
+                    border: `2px solid ${isDone ? '#15803d' : 'var(--border-medium)'}`,
+                    background: isDone ? '#15803d' : '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -901,8 +901,8 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
               height: '100%',
               background:
                 completedStepsCount === totalSteps
-                  ? '#059669'
-                  : 'linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%)',
+                  ? '#15803d'
+                  : 'var(--accent-primary)',
               transition: 'width 0.3s ease',
             }}
           />
@@ -1530,10 +1530,10 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
             const status = trouble.troubleshootingStatus || (trouble.verifiedInTesting ? 'Reproduced in Testing' : 'Documented');
             const statusConfig =
               status === 'Reproduced in Testing'
-                ? { text: 'Confirmed in Testing', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0', icon: <CheckCircle2 size={13} /> }
+                ? { text: 'Confirmed in Testing', color: '#15803d', bg: '#f0fdf4', border: '#bbf7d0', icon: <CheckCircle2 size={13} /> }
                 : status === 'Likely Cause'
                 ? { text: 'Likely Cause', color: '#b45309', bg: '#fffbeb', border: '#fde68a', icon: <AlertTriangle size={13} /> }
-                : { text: 'Documented Scenario', color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe', icon: <FileText size={13} /> };
+                : { text: 'Documented Scenario', color: '#4338ca', bg: '#eef2ff', border: '#c7d2fe', icon: <FileText size={13} /> };
 
             return (
               <div
@@ -1552,12 +1552,12 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                     <code
                       style={{
                         fontSize: '0.92rem',
-                        color: '#b91c1c',
-                        background: '#fef2f2',
+                        color: '#b45309',
+                        background: '#fffbeb',
                         padding: '0.25rem 0.6rem',
                         borderRadius: 'var(--radius-sm)',
                         fontWeight: 700,
-                        border: '1px solid #fecaca',
+                        border: '1px solid #fde68a',
                       }}
                     >
                       {trouble.errorCode}
@@ -1609,8 +1609,8 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                   </div>
 
                   {/* Step 2: Resolve */}
-                  <div style={{ padding: '0.85rem 1rem', background: '#eff6ff', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #2563eb' }}>
-                    <div style={{ fontSize: '0.74rem', color: '#1d4ed8', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                  <div style={{ padding: '0.85rem 1rem', background: '#eef2ff', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #4f46e5' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#4338ca', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                       2. Resolve (Actionable Fix)
                     </div>
                     <p style={{ fontSize: '0.86rem', color: '#0f172a', margin: 0, lineHeight: '1.5' }}>
@@ -1619,12 +1619,12 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                   </div>
 
                   {/* Step 3: Verify */}
-                  <div style={{ padding: '0.85rem 1rem', background: '#ecfdf5', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #059669' }}>
-                    <div style={{ fontSize: '0.74rem', color: '#047857', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <div style={{ padding: '0.85rem 1rem', background: '#f0fdf4', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #15803d' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#15803d', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                       <CheckCircle2 size={12} />
                       <span>3. Verify (Confirm Fix Worked)</span>
                     </div>
-                    <p style={{ fontSize: '0.86rem', color: '#047857', margin: 0, lineHeight: '1.5' }}>
+                    <p style={{ fontSize: '0.86rem', color: '#15803d', margin: 0, lineHeight: '1.5' }}>
                       {trouble.verification || 'Retry the authorization request and verify that the expected grant response or callback code is received without error.'}
                     </p>
                   </div>
@@ -1789,15 +1789,15 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
 
                     {/* 2-column breakdown: What it establishes vs What it does NOT establish */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.65rem', marginTop: '0.5rem' }}>
-                      <div style={{ padding: '0.6rem 0.75rem', background: '#ecfdf5', borderRadius: 'var(--radius-sm)', border: '1px solid #a7f3d0', fontSize: '0.78rem', color: '#047857' }}>
-                        <strong style={{ color: '#047857', display: 'block', marginBottom: '0.15rem' }}>
+                      <div style={{ padding: '0.6rem 0.75rem', background: '#f0fdf4', borderRadius: 'var(--radius-sm)', border: '1px solid #bbf7d0', fontSize: '0.78rem', color: '#15803d' }}>
+                        <strong style={{ color: '#15803d', display: 'block', marginBottom: '0.15rem' }}>
                           ✓ What this establishes:
                         </strong>
                         {establishes}
                       </div>
 
-                      <div style={{ padding: '0.6rem 0.75rem', background: '#fef2f2', borderRadius: 'var(--radius-sm)', border: '1px solid #fecaca', fontSize: '0.78rem', color: '#b91c1c' }}>
-                        <strong style={{ color: '#b91c1c', display: 'block', marginBottom: '0.15rem' }}>
+                      <div style={{ padding: '0.6rem 0.75rem', background: '#fffbeb', borderRadius: 'var(--radius-sm)', border: '1px solid #fde68a', fontSize: '0.78rem', color: '#b45309' }}>
+                        <strong style={{ color: '#b45309', display: 'block', marginBottom: '0.15rem' }}>
                           ✗ What this does NOT establish:
                         </strong>
                         {doesNotEstablish}
@@ -1839,9 +1839,9 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
                   fontWeight: 700,
                   padding: '0.25rem 0.65rem',
                   borderRadius: '9999px',
-                  background: dynamicRec.sourceType === 'complete' ? '#ecfdf5' : dynamicRec.sourceType === 'prerequisite' ? '#fffbeb' : '#eff6ff',
-                  color: dynamicRec.sourceType === 'complete' ? '#047857' : dynamicRec.sourceType === 'prerequisite' ? '#b45309' : '#1d4ed8',
-                  border: `1px solid ${dynamicRec.sourceType === 'complete' ? '#a7f3d0' : dynamicRec.sourceType === 'prerequisite' ? '#fde68a' : '#bfdbfe'}`,
+                  background: dynamicRec.sourceType === 'complete' ? '#f0fdf4' : dynamicRec.sourceType === 'prerequisite' ? '#fffbeb' : '#eef2ff',
+                  color: dynamicRec.sourceType === 'complete' ? '#15803d' : dynamicRec.sourceType === 'prerequisite' ? '#b45309' : '#4338ca',
+                  border: `1px solid ${dynamicRec.sourceType === 'complete' ? '#bbf7d0' : dynamicRec.sourceType === 'prerequisite' ? '#fde68a' : '#c7d2fe'}`,
                 }}
               >
                 {dynamicRec.statusBadge}
@@ -1877,11 +1877,11 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
               </div>
             </div>
 
-            <div style={{ padding: '0.95rem', background: '#ecfdf5', borderRadius: 'var(--radius-sm)', border: '1px solid #a7f3d0' }}>
-              <div style={{ fontSize: '0.72rem', color: '#047857', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em', marginBottom: '0.3rem' }}>
+            <div style={{ padding: '0.95rem', background: '#f0fdf4', borderRadius: 'var(--radius-sm)', border: '1px solid #bbf7d0' }}>
+              <div style={{ fontSize: '0.72rem', color: '#15803d', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em', marginBottom: '0.3rem' }}>
                 Success Condition:
               </div>
-              <div style={{ fontSize: '0.84rem', color: '#047857', fontWeight: 600, lineHeight: 1.4 }}>
+              <div style={{ fontSize: '0.84rem', color: '#15803d', fontWeight: 600, lineHeight: 1.4 }}>
                 {dynamicRec.successCondition}
               </div>
             </div>
@@ -1920,7 +1920,7 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
               </button>
             )}
             {dynamicRec.sourceType === 'complete' && (
-              <span style={{ fontSize: '0.82rem', color: '#047857', fontWeight: 700 }}>
+              <span style={{ fontSize: '0.82rem', color: '#15803d', fontWeight: 700 }}>
                 ✓ Ready for final production launch review
               </span>
             )}
@@ -1929,7 +1929,7 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
           {/* Human Action Required (Automation Boundary) */}
           {guide.agentFindings.humanActionRequired.length > 0 && (
             <div>
-              <div style={{ fontSize: '0.78rem', color: '#b91c1c', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <div style={{ fontSize: '0.78rem', color: '#b45309', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <ShieldAlert size={14} />
                 <span>Tasks Required by Developer (Outside Agent Sandbox):</span>
               </div>

@@ -53,13 +53,12 @@ export const GuideSearch: React.FC<GuideSearchProps> = ({
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
       case 'Easy':
-        return { color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' };
+        return { color: '#15803d', bg: '#f0fdf4', border: '#bbf7d0' };
       case 'Moderate':
-        return { color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' };
+        return { color: '#4338ca', bg: '#eef2ff', border: '#c7d2fe' };
       case 'Complex':
-        return { color: '#b45309', bg: '#fffbeb', border: '#fde68a' };
       case 'Advanced':
-        return { color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' };
+        return { color: '#b45309', bg: '#fffbeb', border: '#fde68a' };
       default:
         return { color: '#475569', bg: '#f1f5f9', border: '#cbd5e1' };
     }
