@@ -6,7 +6,7 @@ import { GuideSchema } from '@/types/guide';
 import { GuideSearch } from '@/components/GuideSearch';
 import { GuideViewer } from '@/components/GuideViewer';
 import { LiveResearchConsole } from '@/components/LiveResearchConsole';
-import { Sparkles, ShieldCheck, Zap, BookOpen, Layers } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export default function HomePage() {
   const [guides, setGuides] = useState<GuideSchema[]>(seedGuides);
@@ -121,51 +121,9 @@ export default function HomePage() {
               OAuth Setup Guide Agent
             </h1>
 
-            <p style={{ maxWidth: '680px', margin: '0 auto 2.5rem', fontSize: '1.05rem', color: 'var(--text-secondary)' }}>
+            <p style={{ maxWidth: '680px', margin: '0 auto 1.5rem', fontSize: '1.05rem', color: 'var(--text-secondary)' }}>
               Navigate provider developer consoles, permission scopes, consent configurations, and external verification requirements with verified evidence and predictable timelines.
             </p>
-
-            {/* Architecture Highlights Bar */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '1rem',
-                maxWidth: '960px',
-                margin: '0 auto 3rem',
-                textAlign: 'left',
-              }}
-            >
-              <div style={{ padding: '1.1rem', background: '#ffffff', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.88rem' }}>
-                  <BookOpen size={16} />
-                  <span>Curated Benchmark Library</span>
-                </div>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  Pre-verified benchmark setup guides covering low, medium, and high-friction providers.
-                </p>
-              </div>
-
-              <div style={{ padding: '1.1rem', background: '#ffffff', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem', color: 'var(--status-tested-text)', fontWeight: 600, fontSize: '0.88rem' }}>
-                  <ShieldCheck size={16} />
-                  <span>Evidence Attribution</span>
-                </div>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  Explicit verification tags: Documented, Config Checked, Tested, Estimated, and Blocked.
-                </p>
-              </div>
-
-              <div style={{ padding: '1.1rem', background: '#ffffff', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.88rem' }}>
-                  <Layers size={16} />
-                  <span>Standard 6-Section Schema</span>
-                </div>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  Sections A through F ensure uniform structure, troubleshooting runbooks, and clear handoffs.
-                </p>
-              </div>
-            </div>
           </section>
 
           {/* Library Section */}
