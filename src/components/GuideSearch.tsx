@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { GuideSchema } from '@/types/guide';
-import { Search, Clock, ShieldCheck, ArrowRight, Filter, Zap, ShieldAlert, Sparkles } from 'lucide-react';
+import { Search, Clock, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
 import { EvidenceBadge } from '@/components/EvidenceBadge';
 
 interface GuideSearchProps {
@@ -9,37 +9,17 @@ interface GuideSearchProps {
   onInitiateLiveResearch?: (query: string) => void;
 }
 
-type FilterCategory = 'all' | 'instant' | 'requires_review' | 'managed_oauth';
-
 export const GuideSearch: React.FC<GuideSearchProps> = ({
   guides,
   onSelectGuide,
   onInitiateLiveResearch,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<FilterCategory>('all');
 
   const filteredGuides = useMemo(() => {
+    if (!searchQuery.trim()) return guides;
+    const q = searchQuery.toLowerCase();
     return guides.filter((guide) => {
-      // Filter category check
-      if (selectedFilter === 'instant') {
-        const isInstant =
-          guide.readiness.externalWaitingTime.toLowerCase().includes('0 days') ||
-          guide.readiness.externalWaitingTime.toLowerCase().includes('instant');
-        if (!isInstant) return false;
-      } else if (selectedFilter === 'requires_review') {
-        const needsReview =
-          guide.readiness.externalWaitingTime.toLowerCase().includes('business days') ||
-          guide.readiness.externalWaitingTime.toLowerCase().includes('weeks') ||
-          guide.verification.verificationTriggers.length > 0;
-        if (!needsReview) return false;
-      } else if (selectedFilter === 'managed_oauth') {
-        if (!guide.provider.managedOAuthAvailable) return false;
-      }
-
-      // Text query check
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
       return (
         guide.provider.name.toLowerCase().includes(q) ||
         guide.provider.category?.toLowerCase().includes(q) ||
@@ -48,7 +28,7 @@ export const GuideSearch: React.FC<GuideSearchProps> = ({
         guide.readiness.launchBlockers.some((b) => b.toLowerCase().includes(q))
       );
     });
-  }, [guides, searchQuery, selectedFilter]);
+  }, [guides, searchQuery]);
 
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
@@ -78,41 +58,6 @@ export const GuideSearch: React.FC<GuideSearchProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             id="guide-search-input"
           />
-        </div>
-
-        {/* Filter Chips */}
-        <div className="filter-chip-group">
-          <button
-            className={`filter-chip ${selectedFilter === 'all' ? 'active' : ''}`}
-            onClick={() => setSelectedFilter('all')}
-            id="filter-all"
-          >
-            All Guides ({guides.length})
-          </button>
-          <button
-            className={`filter-chip ${selectedFilter === 'instant' ? 'active' : ''}`}
-            onClick={() => setSelectedFilter('instant')}
-            id="filter-instant"
-          >
-            <Zap size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '4px' }} />
-            Instant Launch (0-Day Review)
-          </button>
-          <button
-            className={`filter-chip ${selectedFilter === 'requires_review' ? 'active' : ''}`}
-            onClick={() => setSelectedFilter('requires_review')}
-            id="filter-review"
-          >
-            <ShieldAlert size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '4px' }} />
-            Requires Verification Review
-          </button>
-          <button
-            className={`filter-chip ${selectedFilter === 'managed_oauth' ? 'active' : ''}`}
-            onClick={() => setSelectedFilter('managed_oauth')}
-            id="filter-managed"
-          >
-            <ShieldCheck size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '4px' }} />
-            Managed OAuth Available
-          </button>
         </div>
       </div>
 

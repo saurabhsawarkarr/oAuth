@@ -45,7 +45,6 @@ export default function RootLayout({
               <div>
                 <span>OAuth Guide Agent</span>
               </div>
-              <span className="brand-badge">Gemini Powered</span>
             </Link>
 
             <nav className="nav-links">
