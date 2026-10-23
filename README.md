@@ -159,7 +159,7 @@ npm run test:all
 - `npm run test:redaction`: **Secret Scrubbing & Guide Payload Audit** — Tests synthetic credential injections (Google secrets, GitHub PATs, Slack bot tokens, Stripe keys) and scans 100% of seed and generated guide JSON files.
 - `npm run test:pipeline`: **7-Stage Autonomous Pipeline Test** — Ingests an unfamiliar app, verifies live discovery probes, Gemini extraction, and schema conformance.
 - `npm run test:e2e`: **Comprehensive 35-Check APM Validation Suite** — Systematically validates Test Cases 1 through 6:
-  - **Test Case 1 (Google Cloud):** Validates restricted scopes, CASA Tier 2 security review, and multi-week review timelines.
+  - **Test Case 1 (Google Cloud):** Validates restricted scopes (gmail.readonly, mail.google.com) vs sensitive scopes (gmail.send), conditional CASA security assessments, and unconfirmed review timeline guidance.
   - **Test Case 2 (GitHub):** Validates instant self-serve setup, 0 business days external wait, and localhost callback rules.
   - **Test Case 3 (Slack Platform):** Validates bot vs. user token scope matrix and workspace distribution activation.
   - **Test Case 4 (Notion):** Validates internal vs. public integration distinctions and OAuth endpoints.
@@ -175,7 +175,7 @@ The pre-seeded library demonstrates varied OAuth friction models across the SaaS
 
 | Provider | Difficulty | External Waiting Time | Key Differentiation |
 | :--- | :--- | :--- | :--- |
-| **Google Cloud (Gmail API)** | Complex (High Friction) | 3–7 business days (OAuth Verification & CASA Security Assessment) | Restricted scope verification, annual CASA Tier 2 third-party audit, YouTube consent demo video, Google Search Console domain verification. |
+| **Google Cloud (Gmail API)** | Complex (High Friction) | Timeline not confirmed; check current provider guidance | Restricted scope verification, conditional CASA third-party audit for server-side data access, consent flow demo video, Google Search Console domain verification. |
 | **GitHub (OAuth Apps)** | Easy (Instant Launch) | 0 business days (Instant Self-Serve) | Zero verification gating, immediate client secret generation, seamless localhost testing for rapid local development. |
 | **Slack Platform (Slack Apps)** | Moderate (Granular Scopes) | 0 days direct install / 2–4 weeks App Directory | Granular Bot Token (`xoxb-`) vs. User Token (`xoxp-`) separation, multi-workspace public distribution activation, workspace admin installation consent. |
 | **Notion (Integrations & OAuth)** | Moderate (Workspace Access) | 0 days public link / optional Gallery review | Distinct architectural paths: static Internal Integration vs. Public OAuth flow with granular page-by-page user authorization. |

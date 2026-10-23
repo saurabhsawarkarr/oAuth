@@ -1314,7 +1314,7 @@ export const GuideViewer: React.FC<GuideViewerProps> = ({ guide, onBack, shareab
               </strong>
               {guide.verification.additionalProductionRequirements ||
                 (guide.provider.name.includes('Google')
-                  ? 'Internal workspace users can use app without review. Public multi-tenant use triggers CASA Tier 2 security review.'
+                  ? 'Internal workspace users can use app without review. Public multi-tenant use with restricted data stored on third-party servers may require an annual security assessment (such as CASA).'
                   : 'Internal team usage is immediate. Public App Directory / Marketplace listings require provider brand review.')}
             </div>
           </div>

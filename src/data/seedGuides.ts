@@ -18,17 +18,17 @@ export const seedGuides: GuideSchema[] = [
     readiness: {
       difficulty: 'Complex',
       handsOnEffort: '45–90 minutes configuration + code integration',
-      externalWaitingTime: '3–7 business days (OAuth Verification & CASA Security Assessment)',
+      externalWaitingTime: 'Timeline not confirmed; check current provider guidance (sensitive/restricted scope reviews vary by scope type and assessment requirements)',
       providerSetupTime: '15–20 minutes (GCP Project, Consent Screen & Credentials)',
       integrationTestingTime: '30–45 minutes (OAuth code exchange & token storage)',
-      externalReviewTime: '3–7 business days (Mandatory for external users requesting restricted Gmail scopes)',
+      externalReviewTime: 'Timeline not confirmed; check current provider guidance',
       readinessStatus: 'Provider review required',
       importantBeforeYouStart:
-        'Confirm whether your app requires read-only (gmail.readonly) or full mailbox access (mail.google.com). Restricted scopes trigger mandatory annual CASA Tier 2 security assessments ($500–$2,000) and an unlisted YouTube demonstration video before external users can authorize without blocking screens.',
+        'Confirm whether your app requires read-only access (gmail.readonly, restricted) or sending privileges (gmail.send, sensitive). An annual security assessment (such as CASA) applies when an app accesses restricted user data from or through a third-party server, subject to applicable exceptions and tier determinations (no fixed tier or price is set by Google). A video demonstration showing the user consent flow and scope usage is also required before external users can authorize without warning screens.',
       launchBlockers: [
         'OAuth Consent Screen verification required for external users requesting sensitive/restricted scopes.',
         'Domain ownership must be verified in Google Search Console for production redirect URIs.',
-        'CASA Tier 2 Security Assessment required if requesting mail.google.com or drive scopes.',
+        'Annual security assessment (such as CASA) conditionally required if accessing restricted user data from or through a third-party server, subject to applicable exceptions.',
       ],
       structuredBlockers: [
         {
@@ -43,8 +43,8 @@ export const seedGuides: GuideSchema[] = [
         },
         {
           whatIsBlocked: 'Production verification sign-off from Google Trust & Safety.',
-          whenItApplies: 'When requesting restricted scopes (e.g. https://mail.google.com/, gmail.send).',
-          howToResolve: 'Provide an unlisted YouTube video showing the OAuth flow with client_id visible in URL, and undergo annual CASA Tier 2 assessment.',
+          whenItApplies: 'When requesting restricted scopes (e.g. https://mail.google.com/, https://www.googleapis.com/auth/gmail.readonly) or sensitive scopes (e.g. https://www.googleapis.com/auth/gmail.send).',
+          howToResolve: 'Provide a video demonstration showing the user consent flow and how requested scopes are used in the application. Complete an annual security assessment (such as CASA) if accessing restricted user data from or through a third-party server, subject to applicable exceptions.',
         },
       ],
     },
@@ -59,10 +59,11 @@ export const seedGuides: GuideSchema[] = [
       },
       {
         category: 'Project Setup',
-        description: 'Dedicated Google Cloud Project with billing enabled (required for higher API quotas).',
-        required: true,
-        requirementLevel: 'Required',
-        whyNeeded: 'All Google API quotas, OAuth client IDs, and billing are scoped strictly to a GCP project.',
+        description: 'Dedicated Google Cloud Project (enable billing if prompted or when higher API quotas are needed).',
+        required: false,
+        requirementLevel: 'Conditional',
+        condition: 'Conditional: Billing is not universally required for creating a project or OAuth client; enable billing if prompted by Google Cloud Console or if requiring higher API quotas.',
+        whyNeeded: 'All Google API quotas and OAuth client IDs are scoped strictly to a GCP project. Basic OAuth registration and testing do not require active billing unless prompted.',
         unblocksStepNumbers: [1, 2],
       },
       {
@@ -85,11 +86,11 @@ export const seedGuides: GuideSchema[] = [
       },
       {
         category: 'Credentials & Scopes',
-        description: 'YouTube demonstration video showing user grant flow and explicit scope usage.',
+        description: 'Video demonstration showing user consent flow and how requested scopes are used.',
         required: false,
-        condition: 'Mandatory during Google verification review for restricted scopes.',
+        condition: 'Required during Google verification review for sensitive or restricted scopes.',
         requirementLevel: 'Conditional',
-        whyNeeded: 'Google verification team requires visual proof of client ID in address bar and consent screen flow.',
+        whyNeeded: 'Google Trust & Safety requires documentation showing the OAuth user consent flow and demonstrating how requested scopes are utilized within the application.',
         unblocksStepNumbers: [4, 7],
       },
     ],
@@ -100,8 +101,8 @@ export const seedGuides: GuideSchema[] = [
         purpose: 'All credentials, quotas, and API access permissions are scoped to a GCP project.',
         whereToGo: 'Google Cloud Console (console.cloud.google.com) > Top Bar Project Dropdown > "New Project"',
         instructions:
-          'Open Google Cloud Console, click the project dropdown in the top bar, select "New Project", specify a project name, and link a billing account.',
-        inputsRequired: ['Project Name', 'Billing Account (optional for testing)'],
+          'Open Google Cloud Console, click the project dropdown in the top bar, select "New Project", and specify a project name. Enable billing if prompted or if higher API quotas are required.',
+        inputsRequired: ['Project Name', 'Billing Account (conditional / if prompted)'],
         expectedOutcome: 'Active Google Cloud Project created with a unique Project ID assigned.',
         howToVerify: 'Verify project name appears in the top navigation bar with an active Project ID assigned.',
         sourceUrl: 'https://developers.google.com/workspace/guides/create-project',
@@ -142,7 +143,7 @@ export const seedGuides: GuideSchema[] = [
         purpose: 'Specifies the minimum necessary permissions required by your application.',
         whereToGo: 'OAuth consent screen > Scopes tab > "Add or Remove Scopes"',
         instructions:
-          'Under OAuth consent screen > "Scopes", click "Add or Remove Scopes". Select specific Gmail scopes (e.g. "https://www.googleapis.com/auth/gmail.readonly" or "gmail.send"). Avoid full "mail.google.com" if read-only is sufficient.',
+          'Under OAuth consent screen > "Scopes", click "Add or Remove Scopes". Select specific Gmail scopes adhering to least privilege: note that "https://www.googleapis.com/auth/gmail.send" is classified as Sensitive, whereas read-only mailbox access ("https://www.googleapis.com/auth/gmail.readonly") and full mailbox access ("https://mail.google.com/") are classified as Restricted. Avoid full "mail.google.com" if narrower access suffices.',
         inputsRequired: ['Selected Scopes list', 'Justification for each sensitive scope'],
         expectedOutcome: 'Scopes registered and categorized as Non-sensitive, Sensitive, or Restricted.',
         howToVerify: 'Ensure selected scopes appear under the "Your sensitive/restricted scopes" table without validation errors.',
@@ -187,8 +188,8 @@ export const seedGuides: GuideSchema[] = [
         purpose: 'Removes the 100-user limit and the "Google has not verified this app" warning screen.',
         whereToGo: 'OAuth consent screen > "Prepare for Verification" / "Publish App"',
         instructions:
-          'When ready for public users, click "Publish App" on the Consent Screen and click "Prepare for Verification". Submit domain verification proof, privacy policy, and YouTube video demonstrating authorization and scope usage.',
-        inputsRequired: ['YouTube Demo Video URL', 'Written explanation of data usage', 'Privacy Policy link'],
+          'When ready for public users, click "Publish App" on the Consent Screen and click "Prepare for Verification". Submit domain verification proof, privacy policy, and a video demonstration (e.g. unlisted YouTube link) showing the user consent flow and how requested scopes are used.',
+        inputsRequired: ['Consent Flow Demo Video URL', 'Written explanation of data usage', 'Privacy Policy link'],
         expectedOutcome: 'Verification ticket opened with Google Trust & Safety team.',
         howToVerify: 'Check that verification ticket status changes to "Under Review" with email confirmation from api-oauth-dev-verification@google.com.',
         isConditional: true,
@@ -202,31 +203,31 @@ export const seedGuides: GuideSchema[] = [
       testingModeSupported: true,
       testingRestrictions: 'Strict 100-user limit; unverified app warning screen displayed to non-test users.',
       verificationTriggers: [
-        'Requesting Sensitive scopes (e.g., userinfo.profile, userinfo.email).',
-        'Requesting Restricted scopes (e.g., https://mail.google.com/, gmail.readonly, gmail.send).',
+        'Requesting Sensitive scopes (e.g., https://www.googleapis.com/auth/gmail.send, userinfo.profile, userinfo.email).',
+        'Requesting Restricted scopes (e.g., https://mail.google.com/, https://www.googleapis.com/auth/gmail.readonly).',
         'Switching OAuth publishing status to "In Production" with External user type.',
       ],
       requiredDocumentation: [
         'Public Privacy Policy clearly disclosing Google user data access.',
         'Public Terms of Service URL on an authorized domain.',
-        'Unlisted YouTube demonstration video showing the OAuth flow and client ID parameter.',
-        'Annual Cloud Application Security Assessment (CASA Tier 2) for restricted scopes.',
+        'Video demonstration (e.g. unlisted YouTube link) clearly showing the user consent flow and how requested scopes are used in the application.',
+        'Annual security assessment (e.g., CASA Tier 2) conditionally required if accessing restricted user data from or through a third-party server, subject to applicable exceptions.',
       ],
-      publishedReviewTimelines: '3 to 7 business days per review cycle; multiple rounds are common if justifications are vague.',
+      publishedReviewTimelines: 'Timeline not confirmed; check current provider guidance (review durations vary depending on scope types, assessment requirements, and queue volume).',
       unknowns: [
-        'Whether Google will require CASA Tier 2 assessment (typically depends on aggregate user volume and specific restricted scope combo).',
+        'Specific security assessment tier and pricing: Google requires an annual assessment when an app accesses restricted user data from or through a third-party server, but specific tier designations, applicable exceptions, and assessor pricing vary and are not fixed by Google.',
       ],
       testingPossibleNow: true,
       testingEnvironmentDetails: 'Immediate testing with up to 100 pre-registered test accounts in "Testing" mode. Warning screen bypassed for registered testers.',
-      additionalProductionRequirements: 'Mandatory CASA Tier 2 assessment ($500–$2,000 via authorized lab) and unlisted YouTube walkthrough video required for restricted scopes.',
+      additionalProductionRequirements: 'Conditional annual security assessment (e.g., CASA) if accessing restricted user data through a third-party server, and video demonstration showing user consent flow and scope usage.',
       marketplaceReviewApplicable: true,
       reviewTriggerExplanation: 'Publishing app to External status with sensitive or restricted Gmail scopes.',
       timelineEvidence: {
-        publishedEstimate: '3 to 7 business days per review cycle',
+        publishedEstimate: 'Timeline not confirmed; check current provider guidance',
         sourceUrl: 'https://support.google.com/cloud/answer/13463073',
-        dateChecked: 'Verified via Google OAuth API Verification FAQ (October 2024)',
+        dateChecked: 'Reviewed per current Google Cloud OAuth verification guidance',
         isGuarantee: false,
-        timelineNotes: 'Guidance estimate only. Reviews routinely require 2–3 iterative feedback cycles if YouTube demonstration does not clearly display the OAuth client_id in the browser address bar.',
+        timelineNotes: 'Timeline not confirmed; check current provider guidance. Exact verification turnaround depends on scope classification and third-party security assessment requirements.',
       },
       launchChecklist: [
         {
@@ -246,7 +247,7 @@ export const seedGuides: GuideSchema[] = [
         {
           checkItem: 'Confirm whether public distribution requires approval',
           condition: 'Required when expanding beyond the 100-user sandbox limit.',
-          actionRequired: 'Record unlisted YouTube walkthrough showing client_id in address bar and consent screen grant flow.',
+          actionRequired: 'Record a video walkthrough (e.g., unlisted YouTube video) demonstrating the end-to-end user consent flow and how requested scopes are used in the app.',
           evidenceSourceUrl: 'https://support.google.com/cloud/answer/13463073',
           isMandatory: true,
         },
@@ -313,9 +314,9 @@ export const seedGuides: GuideSchema[] = [
         },
       ],
       requirementsExtractedSummary: [
-        'Requires Google Cloud Project with Billing for production workloads.',
+        'Google Cloud Project required (enable billing if prompted or when scaling quotas beyond default limits).',
         'External user type mandates consent screen publication.',
-        'Restricted Gmail scopes trigger CASA security assessment and video demo.',
+        'Restricted Gmail scopes trigger a conditional security assessment (CASA) when accessing data via third-party servers, alongside a consent flow video demonstration.',
       ],
       configurationChecksPerformed: [
         'Verified OIDC discovery endpoint accounts.google.com/.well-known/openid-configuration.',
@@ -333,12 +334,12 @@ export const seedGuides: GuideSchema[] = [
         },
       ],
       unverifiedClaims: [
-        'Exact third-party audit fee for CASA Tier 2 assessment (typically ranges $500–$2,000 via authorized lab).',
+        'Security assessment pricing and tier mandates: Google does not establish fixed tiers or prices ($500–$2,000 claims are unverified vendor estimates); assessment terms depend on third-party assessor selection and whether server-side data access exceptions apply.',
       ],
       humanActionRequired: [
         'Create Google Cloud Project and accept Terms of Service.',
         'Verify domain ownership via DNS TXT record or HTML file in Google Search Console.',
-        'Record unlisted YouTube walkthrough video for sensitive scope review.',
+        'Record a video demonstration showing user consent flow and scope usage for verification review.',
       ],
       nextRecommendedAction:
         'Start in "Testing" mode with test users to validate your integration before submitting the formal verification request.',
@@ -350,16 +351,16 @@ export const seedGuides: GuideSchema[] = [
           relevance: 'Redirect URI Validation & Whitelist Rules',
         },
         {
-          claim: 'Restricted Gmail scopes (mail.google.com) trigger annual CASA Tier 2 security assessment.',
+          claim: 'Apps accessing restricted Google user data from or through a third-party server are subject to an annual security assessment (such as CASA), subject to applicable exceptions.',
           evidenceUrl: 'https://support.google.com/cloud/answer/13463073',
           sourceTitle: 'Google Cloud: OAuth API Verification FAQ',
           relevance: 'Third-Party Security Audit Gating',
         },
         {
-          claim: 'OAuth Consent Screen requires unlisted YouTube demo video showing client_id parameter.',
+          claim: 'Google OAuth verification requires a video demonstration showing the user consent flow and how requested scopes are used.',
           evidenceUrl: 'https://support.google.com/cloud/answer/13463073',
-          sourceTitle: 'Google Trust & Safety: Verification Video Requirements',
-          relevance: 'Production Verification Video Requirement',
+          sourceTitle: 'Google Trust & Safety: Verification Requirements',
+          relevance: 'Production Consent Flow Video Requirement',
         },
       ],
       contextualHandOff: {

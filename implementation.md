@@ -95,8 +95,8 @@ Deliver an instant-access library of benchmark OAuth guides covering varied setu
    Craft 4 pre-verified, comprehensive guide fixtures representing diverse real-world integration challenges:
    - **Google Cloud / Gmail (High Friction):**
      - OAuth Consent Screen configuration (Internal vs External).
-     - Scope gating (Restricted scopes such as `https://mail.google.com/`).
-     - Verification requirements: Domain verification in Google Search Console, YouTube demo video, CASA Tier 2 security assessment, published review waiting time.
+     - Scope gating (Restricted scopes such as `https://mail.google.com/`, `gmail.readonly` vs sensitive scopes like `gmail.send`).
+     - Verification requirements: Domain verification in Google Search Console, consent flow demo video, conditional CASA security assessment, unconfirmed review waiting time.
    - **GitHub OAuth App (Low Friction / Fast Self-Serve):**
      - Simple developer settings, personal vs. organization ownership.
      - Flexible redirect URIs (`http://localhost:3000/callback` supported).

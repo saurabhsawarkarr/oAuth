@@ -255,7 +255,7 @@ All guides—whether pre-seeded in the library or synthesized on the fly—confo
   "readiness": {
     "difficulty": "Moderate",
     "handsOnEffort": "30-60 minutes",
-    "externalWaitingTime": "3-7 business days for sensitive/restricted scopes; 0 days for internal/testing mode",
+    "externalWaitingTime": "Timeline not confirmed; check current provider guidance for sensitive/restricted scopes; 0 days for internal/testing mode",
     "launchBlockers": [
       "OAuth Consent Screen verification required for external users with sensitive scopes",
       "Domain ownership verification required via Google Search Console"
@@ -294,7 +294,7 @@ All guides—whether pre-seeded in the library or synthesized on the fly—confo
       "Requesting sensitive scopes (e.g., Gmail, Drive)",
       "Switching publishing status to 'In Production' with an external user type"
     ],
-    "reviewTimelines": "3 to 7 business days per review round",
+    "reviewTimelines": "Timeline not confirmed; check current provider guidance",
     "unknowns": []
   },
   "troubleshooting": [

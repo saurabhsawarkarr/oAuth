@@ -17,11 +17,11 @@
     "integrationTestingTime": "15–25 minutes (redirect handler & code-for-token exchange)",
     "externalReviewTime": "Immediate (0 days) in Development mode for up to 25 users; ~10–14 business days for quota extension approval.",
     "readinessStatus": "Blocked by prerequisite",
-    "importantBeforeYouStart": "Confirm whether your integration is for internal workspace members (Development mode strictly limits authorization to up to 25 explicitly invited Spotify accounts registered under \"User Management\" tab in dashboard.) or multi-tenant public distribution. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+    "importantBeforeYouStart": "Confirm whether your integration is for internal workspace members (Development mode strictly limits authorization to up to 25 explicitly invited Spotify accounts registered under \"User Management\" tab in dashboard.) or multi-tenant public distribution. Must be explicitly added to App Settings > Redirect URIs. Strict HTTPS required for production; http://localhost allowed.",
     "launchBlockers": [
-      "Registering an application in Spotify Web API developer portal requires an active developer account (mandatory prerequisite before setup can begin).",
+      "Registering an application in Spotify Web API developer portal requires an active developer account.",
       "Console location: Spotify Developer Dashboard > Dashboard > Create App > Settings.",
-      "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development."
+      "Redirect URIs must match: Must be explicitly added to App Settings > Redirect URIs. Strict HTTPS required for production; http://localhost allowed."
     ],
     "structuredBlockers": [
       {
@@ -117,7 +117,7 @@
       "title": "Configure Authorized Redirect URIs",
       "purpose": "Prevents authorization code interception by locking callbacks to your server.",
       "whereToGo": "https://developer.spotify.com/dashboard > App Settings > Redirect Settings",
-      "instructions": "In the redirect settings, enter your callback URL (e.g. \"http://localhost:3000/api/auth/callback/spotify\"). Note: The example uses http://localhost:3000 for local development testing. Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type. Save changes.",
+      "instructions": "In the redirect settings, enter your callback URL. For local development, enter your local callback URL (e.g. \"http://localhost:3000/api/auth/callback/spotify web api\"). Note: The example uses http://localhost:3000 exclusively for local development testing; deployed staging and production applications require HTTPS matching the registered domain character-for-character. Must be explicitly added to App Settings > Redirect URIs. Strict HTTPS required for production; http://localhost allowed.. Save changes.",
       "inputsRequired": [
         "Authorized Redirect URI"
       ],
@@ -285,7 +285,7 @@
         "observedResult": "HTTP 404. Provider does not expose public .well-known/openid-configuration; uses custom developer documentation endpoints.",
         "whyChecked": "Verify OIDC/RFC 8414 metadata reachability and standard TLS handshake.",
         "whatItEstablishes": "Confirms provider discovery metadata is live, responding, and conforms to RFC 8414 specifications.",
-        "whatItDoesNotEstablish": "Does not establish client app registration, secret validity, or authorized callback execution in your application."
+        "whatItDoesNotEstablish": "Does not prove or disprove standard discovery support (reserved for confirmed OIDC metadata endpoints) and does not establish client app registration."
       },
       {
         "test": "Developer Portal Reachability Check",
@@ -300,9 +300,9 @@
         "test": "Authorization URL Parameter-Format & URL-Construction Check",
         "endpoint": "https://spotify.com/oauth/authorize",
         "status": "Success",
-        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 (S256) syntax specifications.",
-        "whyChecked": "Validate authorization URL query parameter format, query encoding, and URL construction structure.",
-        "whatItEstablishes": "Confirms authorization request syntax adheres to OAuth 2.0 RFC standards.",
+        "observedResult": "Verified query parameter format and URL construction against RFC 6749 and PKCE RFC 7636 S256 parameter syntax.",
+        "whyChecked": "Validate query parameter format, query encoding, and URL construction structure.",
+        "whatItEstablishes": "Confirms authorization query parameter encoding and URL construction adhere to OAuth 2.0 and PKCE syntax specifications.",
         "whatItDoesNotEstablish": "Does not test the live OAuth authorization flow, user consent screen, authorization callback, or token exchange. (Reserved: \"OAuth flow tested\" requires live user consent/callback test; \"token exchange tested\" requires exchange using authorized test credentials)."
       }
     ],
@@ -315,7 +315,7 @@
     "nextRecommendedAction": "Add redirect URI to Spotify Developer Dashboard and test PKCE authorization flow on localhost:3000.",
     "evidenceClaims": [
       {
-        "claim": "Redirect URI requirements: Must match the URI registered with the provider. HTTPS is generally required for deployed applications; localhost exceptions may apply during development. Confirm the exact rules for the selected provider and app type.",
+        "claim": "Redirect URI must match registered callback exactly character-for-character: Must be explicitly added to App Settings > Redirect URIs. Strict HTTPS required for production; http://localhost allowed.",
         "evidenceUrl": "https://developer.spotify.com/dashboard",
         "sourceTitle": "Spotify Web API Developer Portal Redirect Specifications",
         "relevance": "Redirect Security & Callback Whitelist"
@@ -341,7 +341,7 @@
     }
   },
   "metadata": {
-    "generatedAt": "2026-10-22T20:14:01.709Z",
+    "generatedAt": "2026-10-23T18:10:49.836Z",
     "schemaVersion": "1.0.0",
     "isCurated": false
   }

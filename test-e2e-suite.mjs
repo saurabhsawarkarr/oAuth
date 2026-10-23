@@ -30,13 +30,14 @@ assert(
   'Google Cloud classified as Complex difficulty'
 );
 assert(
+  googleGuide.readiness.externalWaitingTime.includes('Timeline not confirmed') ||
   googleGuide.readiness.externalWaitingTime.includes('CASA') ||
   googleGuide.readiness.externalWaitingTime.includes('OAuth Verification'),
-  'Google Cloud external waiting time accurately highlights CASA / OAuth verification'
+  'Google Cloud external waiting time accurately highlights unconfirmed timeline / provider guidance'
 );
 assert(
   googleGuide.verification.requiredDocumentation.some((d) => d.includes('CASA Tier 2')),
-  'Google Cloud documents mandatory CASA Tier 2 security assessment requirement'
+  'Google Cloud documents conditional CASA Tier 2 security assessment requirement'
 );
 assert(
   googleGuide.verification.requiredDocumentation.some((d) => d.includes('YouTube')),
